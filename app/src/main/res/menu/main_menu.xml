@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item android:id="@+id/mobile"
+        android:title="Mobile"/>
+
+    <item android:id="@+id/web"
+        android:title="Web"/>
+
+    <item android:id="@+id/graphic"
+        android:title="Graphic"/>
+
+    <item android:id="@+id/dfds"
+        android:title="vxcv"/>
+
+
+
+
+</menu>

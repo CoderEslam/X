@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="ld_activityScreenTitles">
+        <item>Courses</item>
+        <item>Account</item>
+        <item>Chat</item>
+        <item>Help</item>
+        <item>About</item>
+        <item>Admin</item>
+        <item>Log Out</item>
+    </string-array>
+
+
+    <string-array name="Diploma">
+        <item>Web</item>
+        <item>Mobile</item>
+        <item>graphicDesign</item>
+    </string-array>
+
+    <string-array name="Mobile">
+        <item>Choose</item>
+        <item>Java</item>
+        <item>Flutter</item>
+        <item>Kotlin</item>
+        <item>Ios</item>
+    </string-array>
+
+    <string-array name="Web">
+        <item>Choose</item>
+<!--        <item>HTML</item>-->
+<!--        <item>CSS</item>-->
+<!--        <item>Java Script</item>-->
+<!--        <item>Php</item>-->
+<!--        <item>MySQL</item>-->
+<!--        <item>BootStrat</item>-->
+<!--        <item>React</item>-->
+<!--        <item>Laravel</item>-->
+        <item>FrontEnd</item>
+        <item>FullStack</item>
+
+    </string-array>
+
+    <string-array name="graphicDesign">
+        <item>Choose</item>
+        <item>Photoshop</item>
+        <item>Illustrator</item>
+        <item>InDesign</item>
+        <item>PremierePro</item>
+        <item>AfterEffect</item>
+        <item>AdobeAudition</item>
+        <item>AdobeXD</item>
+        <item>graphicDesignDiploma</item>
+    </string-array>
+
+    <array name="ld_activityScreenIcons">
+        <item>@drawable/ic_baseline_home_24</item>
+        <item>@drawable/account_circle_24</item>
+        <item>@drawable/chat_24</item>
+        <item>@drawable/ic_baseline_help_24</item>
+        <item>@drawable/about_24</item>
+        <item>@drawable/insert_24</item>
+        <item>@drawable/logout_24</item>
+    </array>
+
+
+</resources>

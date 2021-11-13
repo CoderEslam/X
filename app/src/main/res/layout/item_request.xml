@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/buttons_white"
+    android:layout_margin="5dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/RequestImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/account_circle_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/RequestName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Eslam Ghazy"
+        android:textAllCaps="false"
+        android:textColor="@color/darkBlue"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/RequestImage"
+        app:layout_constraintStart_toEndOf="@+id/RequestImage"
+        app:layout_constraintTop_toTopOf="@+id/RequestImage" />
+
+    <TextView
+        android:textColor="@color/darkBlue"
+        android:id="@+id/TrackRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Mobile"
+        app:layout_constraintEnd_toEndOf="@+id/RequestName"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/RequestImage"
+        app:layout_constraintTop_toBottomOf="@+id/RequestName" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animationAccept"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/green_yes_button"
+        />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animationReject"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/animationAccept"
+        app:layout_constraintEnd_toStartOf="@+id/animationAccept"
+        app:layout_constraintTop_toTopOf="@+id/animationAccept"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/no_button"
+         />
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        tools:text="Accepted"
+        android:textAllCaps="false"
+        android:textColor="@color/darkBlue"
+        android:textSize="@dimen/smallText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/RequestImage"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

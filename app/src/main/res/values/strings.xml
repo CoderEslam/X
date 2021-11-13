@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">X</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Log_In">Log In</string>
+    <string name="Skip">Skip</string>
+    <string name="Welcome_back">Welcome</string>
+    <string name="Email">Email</string>
+    <string name="Password">Password at least 8</string>
+    <string name="CONTINUE">Continue</string>
+    <string name="Do_not_Have_an_Account">Do not Have an account?</string>
+    <string name="Forget_Password">Forget Password?</string>
+    <string name="Name">Name</string>
+    <string name="Dont_worry">Don\'t worry we just need your registered email address and it\'s done</string>
+    <string name="Back">Back</string>
+    <string name="XTeamAbout">X TEAM, 20 Khalil Hamada Street, Sidi Bishr, Alexandria, Egypt. \n \n
+
+Our company was founded by young people passionate about programming as an important science of life sciences and a plant with its future fruitful harvest.\n \n
+        The first building blocks of thisentity were developed in 2020, specifically in October. \n \n
+
+We are a privately owned company with a management structure and an executive team. \n \n
+
+The company looks forward to having a large number of young people in the Arab world capable of making progress for the Arab world by seeking the technological development that has been invading the world lately. \n \n
+
+It is worth mentioning that we are targeting more than one side in information technology where there is a special programming sites and another side for advertising and a third side concerned with providing technology academically. \n \n
+
+We can never be too much to talk about human fuel, which we cannot achieve successes and continue to develop without them ...  \n \n
+
+Here we follow the policy of one for all and everyone for one. We are a family of developers, designers, trainers and marketers who work consistently to achieve efficiency and meet the standards that will be a source of bright future for our Arab country.\n \n
+
+But if you think about why X TEAM?\n \n
+
+Simply because we put ourselves in your place with the testimony of those who were already on X-Team, whether they were students or clients\n \n</string>
+    <string name="Hello">Hello</string>
+    <string name="Play_list_id">play list id</string>
+    <string name="requests">Requests</string>
+    <string name="watch">Watch</string>
+    <string name="join">Join</string>
+    <string name="Adv">Adveritsement</string>
+</resources>

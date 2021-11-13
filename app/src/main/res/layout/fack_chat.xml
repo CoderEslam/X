@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!--    <de.hdodenhof.circleimageview.CircleImageView-->
+    <!--        android:id="@+id/profile_image_fack"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="10dp"-->
+    <!--        android:src="@drawable/account_circle_24"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--    <TextView-->
+    <!--        android:paddingEnd="15dp"-->
+    <!--        android:paddingStart="15dp"-->
+    <!--        android:padding="5dp"-->
+    <!--        android:text="Hi, How are you ?"-->
+    <!--        android:id="@+id/show_message"-->
+    <!--        android:layout_width="300dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="10dp"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:background="@drawable/background_left"-->
+    <!--        android:maxLines="10"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/profile_image_fack"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/profile_image_fack"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/profile_image_fack" />-->
+
+    <!--    <de.hdodenhof.circleimageview.CircleImageView-->
+    <!--        android:id="@+id/circleImageView3"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="50dp"-->
+    <!--        android:layout_marginEnd="8dp"-->
+    <!--        android:src="@drawable/account_circle_24"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--    <TextView-->
+    <!--        android:paddingStart="15dp"-->
+    <!--        android:paddingEnd="15dp"-->
+    <!--        android:padding="5dp"-->
+    <!--        android:gravity="end"-->
+    <!--        android:text="I am fine thank you."-->
+    <!--        android:textColor="@color/chat_blue"-->
+    <!--        android:id="@+id/textView6"-->
+    <!--        android:layout_width="300dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="10dp"-->
+    <!--        android:background="@drawable/background_right"-->
+    <!--        android:maxLines="10"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/circleImageView3"-->
+    <!--        app:layout_constraintEnd_toStartOf="@+id/circleImageView3"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/circleImageView3" />-->
+
+
+    <include layout="@layout/item_chat_left" />
+
+    <include layout="@layout/item_chat_right" />
+
+
+</LinearLayout>

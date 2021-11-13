@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "863402352371",
+    "project_id": "x-course-6e1ff",
+    "storage_bucket": "x-course-6e1ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863402352371:android:ce86a55a5fed4dbbbfe186",
+        "android_client_info": {
+          "package_name": "com.doubleclick.x_course"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863402352371-vdounfk26rbu1l5hqkgtgkjt74vu0il5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdc-bVUpH0yuXiZnY3tVZgRefG_-OpdMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863402352371-vdounfk26rbu1l5hqkgtgkjt74vu0il5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

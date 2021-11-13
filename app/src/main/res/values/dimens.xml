@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bigText">50sp</dimen>
+    <dimen name="smallText">18sp</dimen>
+    <dimen name="padding_et">5dp</dimen>
+    <dimen name="et_Enter">18sp</dimen>
+    <dimen name="left_right_margin16">16dp</dimen>
+    <dimen name="left_right_margin32">32dp</dimen>
+
+
+    <dimen name="speech_bubble_corners">10dp</dimen>
+    <dimen name="speech_bubble_corners_plus_tail">15dp</dimen>
+    <dimen name="speech_bubble_spacing">5dp</dimen>
+    <dimen name="speech_bubble_tail">25dp</dimen>
+
+</resources>
