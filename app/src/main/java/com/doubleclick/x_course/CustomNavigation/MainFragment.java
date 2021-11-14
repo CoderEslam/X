@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -128,21 +129,23 @@ public class MainFragment extends Fragment {
         recycler_Advertisement.setLayoutManager(linearLayoutManager);
         loadingAnimView = view.findViewById(R.id.loadingAnimView);
         if (mAuth != null && firebaseUser != null) {
-/*            mainViewModel.getLiveData().observe(getViewLifecycleOwner(), new Observer<ArrayList<Diploma>>() {
+            mainViewModel.getLiveData().observe(getViewLifecycleOwner(), new Observer<ArrayList<Diploma>>() {
                 @Override
                 public void onChanged(ArrayList<Diploma> diplomas) {
 //                    LoadAllDiplomas(diplomas);
                     if (!diplomas.isEmpty()) {
+                        Log.e("MainFragment  = ",""+diplomas.toString());
                         loadingAnimView.setVisibility(View.GONE);
+                        LoadAllDiplomas(diplomas);
                     }
                 }
-            });*/
+            });
 
             mobileViewModel.getMobileData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                 @Override
                 public void onChanged(ArrayList<Diploma> diplomas) {
                     if (!diplomas.isEmpty()){
-                        LoadAllDiplomas(diplomas);
+//                        LoadAllDiplomas(diplomas);
                     }
                 }
             });
@@ -203,7 +206,7 @@ public class MainFragment extends Fragment {
                         @Override
                         public void onChanged(ArrayList<Diploma> diplomas) {
                             Toast.makeText(getContext(), "" + diplomas.toString(), Toast.LENGTH_LONG).show();
-                            LoadAllDiplomas(diplomas);
+//                            LoadAllDiplomas(diplomas);
                         }
                     });
                 }else if (postion==2){
@@ -226,11 +229,11 @@ public class MainFragment extends Fragment {
 
 
     private void LoadAllDiplomas(ArrayList<Diploma> diplomas) {
-        homePageArrayList.add(new HomePage(diplomas,mEmail,mUserId,mUserName,mImageURL,1));
-//        diplomasAdapter = new DiplomasAdapter(diplomas, mEmail, mUserId, mUserName, mImageURL, getContext());
-//        MainRecyclerView.setAdapter(diplomasAdapter); //homePageAdapter
+//        homePageArrayList.add(new HomePage(diplomas,mEmail,mUserId,mUserName,mImageURL,1));
+        diplomasAdapter = new DiplomasAdapter(diplomas, mEmail, mUserId, mUserName, mImageURL, getContext());
+        MainRecyclerView.setAdapter(diplomasAdapter); //homePageAdapter
 //        main_courses.setAdapter(diplomasAdapter);
-//        diplomasAdapter.notifyDataSetChanged();//homePageAdapter
+        diplomasAdapter.notifyDataSetChanged();//homePageAdapter
     }
 
 }

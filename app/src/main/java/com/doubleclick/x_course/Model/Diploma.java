@@ -48,6 +48,16 @@ public class Diploma {
     private String nameOfDiploma;
     private String promo_youtube;
     private String track;
+    private String timestamp;
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
 
     public String getAboutDevelpoer() {
         return aboutDevelpoer;
@@ -349,10 +359,10 @@ public class Diploma {
     @Override
     public String toString() {
         return "Diploma{" +
-                ", NameOfDevelpoer='" + NameOfDevelpoer + '\'' +
-                ", imageOfDiploma='" + imageOfDiploma + '\'' +
+                "NameOfDevelpoer='" + NameOfDevelpoer + '\'' +
                 ", numberOfDiploma='" + numberOfDiploma + '\'' +
                 ", nameOfDiploma='" + nameOfDiploma + '\'' +
+                ", timestamp='" + timestamp + '\'' +
                 '}';
     }
 }

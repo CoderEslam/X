@@ -104,7 +104,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
             ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Web);
             holder.spinnerTrack.setAdapter(aa);
         } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
-            Toast.makeText(holder.itemView.getContext(),""+diplomas.get(holder.getAdapterPosition()).getNameOfDiploma(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(holder.itemView.getContext(), "" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma(), Toast.LENGTH_SHORT).show();
 
             ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Mobile);
             holder.spinnerTrack.setAdapter(aa);
@@ -161,7 +161,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                 if (track.equals("Choose") && !keyJoin.equals("Watch")) {
                     Toast.makeText(holder.itemView.getContext(), "you have to choose track first", Toast.LENGTH_LONG).show();
                 } else if (keyJoin.equals("Delete") || keyJoin.equals("join") || keyJoin.equals("Watch")) {
-                    askJoin(holder, holder.getAdapterPosition());
+                    askJoin(holder);
                 }
             }
         });
@@ -194,16 +194,16 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
     }
 
 
-    private void askJoin(DiplomasAdapter.DiplomasViewHolder holder, int i) {
+    private void askJoin(DiplomasAdapter.DiplomasViewHolder holder) {
         if (mAuth != null) {
             if (keyJoin.equals("join")) {
                 holder.join.setText("Delete");
-                holder.join.setEnabled(false);
-                String PushId = UserId + ":" + diplomas.get(i).getNameOfDiploma() + ":" + diplomas.get(i).getNumberOfDiploma();
+                holder.join.setEnabled(true);
+                String PushId = UserId + ":" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma();
                 Map<String, Object> mapRequest = new HashMap<>();
                 mapRequest.put("email", email_user);
-                mapRequest.put("nameOfDiploma", diplomas.get(i).getNameOfDiploma());
-                mapRequest.put("numberOfDiploma", diplomas.get(i).getNumberOfDiploma());
+                mapRequest.put("nameOfDiploma", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
+                mapRequest.put("numberOfDiploma", diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
                 mapRequest.put("userId", UserId);
                 mapRequest.put("track", track);
                 mapRequest.put("username", UserName);
@@ -221,12 +221,10 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                 });
 
             } else if (keyJoin.equals("Delete")) {
-                keyJoin = "join";
                 holder.join.setText("join");
                 holder.join.setEnabled(true);
-                if (!keyJoin.equals("Watch") && !keyJoin.equals("join")) {
-                    RemoveRequest(holder, i);
-                }
+                RemoveRequest(holder);
+                keyJoin = "join";
 
             } else if (keyJoin.equals("Watch")) {
                 Intent intent = new Intent(holder.itemView.getContext(), CourseActivity.class);
@@ -261,14 +259,15 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
         }
     }
 
-    private void RemoveRequest(DiplomasAdapter.DiplomasViewHolder holder, int postion) {
+    private void RemoveRequest(DiplomasAdapter.DiplomasViewHolder holder) {
         if (mAuth != null) {
             RequestRef.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                 @Override
                 public void onSuccess(DataSnapshot Snapshot) {
                     for (DataSnapshot dataSnapshot : Snapshot.getChildren()) {
-                        if (dataSnapshot.hasChild(UserId + ":" + diplomas.get(postion).getNameOfDiploma() + ":" + diplomas.get(postion).getNumberOfDiploma())) {
-                            RequestRef.child(UserId + ":" + diplomas.get(postion).getNameOfDiploma() + ":" + diplomas.get(postion).getNumberOfDiploma()).removeValue();
+                        Request request = dataSnapshot.getValue(Request.class);
+                        if (request.getUserId().equals(UserId)) {
+                            RequestRef.child(UserId + ":" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma()).removeValue();
                         }
                     }
                 }
@@ -312,6 +311,60 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
     private void CheckSubscription(DiplomasAdapter.DiplomasViewHolder holder, int position) {
         if (mAuth != null) {
             referenceEmails.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                @Override
+                public void onSuccess(DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Emails mEmail = dataSnapshot.getValue(Emails.class);
+                        assert mEmail != null; //make sure mEmail not equal null ,(assert == make sure)
+                        if (mEmail.getEmail().equals(email_user)) {
+                            emails.add(mEmail);
+                            if (mEmail.getEmail().equals(email_user)
+                                    && diplomas.get(position).getNameOfDiploma().equals(mEmail.getDiploma())
+                                    && diplomas.get(position).getNumberOfDiploma().equals(mEmail.getNumberOfDiploma())) {
+                                holder.join.setText("Watch");
+                                keyJoin = "Watch";
+                                holder.watch.setVisibility(View.VISIBLE);
+                                holder.watch.setText("Watch");
+                                holder.join.setVisibility(View.GONE);
+                                check = true;
+                                holder.join.setEnabled(false);
+                                track = mEmail.getTrack();
+                                holder.continer.setVisibility(View.GONE);
+                                AboutIntent.putExtra("check", check);
+                                AboutIntent.putExtra("keyJoin", keyJoin);
+                            } else {
+                                holder.join.setText("join");
+                                keyJoin = "join";
+                                check = false;
+
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
+    private void Checksubscription(DiplomasAdapter.DiplomasViewHolder holder, int position) {
+        if (mAuth != null) {
+            referenceEmails.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.hasChild(diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer()+":"+
+                            diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma()+":"+
+                            diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma()+":"+
+                            diplomas.get(holder.getAdapterPosition()).getTimestamp())){
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                 @Override
                 public void onSuccess(DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {

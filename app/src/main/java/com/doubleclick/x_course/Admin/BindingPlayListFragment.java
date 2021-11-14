@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.doubleclick.x_course.Model.Diploma;
 import com.doubleclick.x_course.R;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,7 +40,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +59,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
     }
 
     private Spinner spinner;
-    private DatabaseReference referenceMobile, referenceWeb, referenceGraphicDesign;// referenceAllPlayLists;
+    private DatabaseReference referenceMobile, referenceWeb, referenceGraphicDesign, referenceAllPlayLists;
     private ArrayList<String> diplomaNameArrayList = new ArrayList<>();
     private String nameDiplomaSpinner;
     private EditText numberOfDiploma;
@@ -97,6 +103,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
             AfterEffectPlayList,
             AdobeAuditionPlayList,
             AdobeXDPlaylist;
+    private Date date;
 
 
     // TODO: Rename and change types and number of parameters
@@ -111,12 +118,12 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        referenceAllPlayLists = FirebaseDatabase.getInstance().getReference().child("AllPlayLists");
+        referenceAllPlayLists = FirebaseDatabase.getInstance().getReference().child("AllPlayLists");
         referenceMobile = FirebaseDatabase.getInstance().getReference().child("Mobile");
         referenceWeb = FirebaseDatabase.getInstance().getReference().child("Web");
         referenceGraphicDesign = FirebaseDatabase.getInstance().getReference().child("GraphicDesign");
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
-
+        date = new Date();
     }
 
     @Override
@@ -125,7 +132,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_playlist_binding, container, false);
         ////////////////////////////////////////////////////////////////////////////////
-        Web = view.findViewById(R.id.Web);//web
+        Web = view.findViewById(R.id.Web);
         HTMLPlayList = view.findViewById(R.id.HTMLPlayList);
         CSSPlayList = view.findViewById(R.id.CSSPlayList);
         JavaScriptPlayList = view.findViewById(R.id.JavaScriptPlayList);
@@ -134,8 +141,6 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         BootStrapPlayList = view.findViewById(R.id.BootStrapPlayList);
         LaravelPlayList = view.findViewById(R.id.LaravelPlayList);
         ReactPlayList = view.findViewById(R.id.ReactPlayList);
-
-
         ///////////////////////////////////////////////////////////////////////////////
         Mobile = view.findViewById(R.id.Mobile); //Mobile
         JavaPlayList = view.findViewById(R.id.JavaPlayList);
@@ -173,7 +178,6 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
 
         imageOfDiploma.setOnClickListener(cklicked -> {
             openGallery();
-
         });
 
 
@@ -188,6 +192,25 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
                 }
             }
         });
+
+        //https://firebaseopensource.com/projects/firebase/firebaseui-android/database/readme/
+        FirebaseRecyclerOptions<Diploma> options = new FirebaseRecyclerOptions.Builder<Diploma>().setQuery(referenceAllPlayLists, Diploma.class).build();
+        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Diploma, DiplomaAdapter>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull DiplomaAdapter diplomaAdapter, int i, @NonNull Diploma diploma) {
+
+                Toast.makeText(getContext(), "This is  = " + diploma.toString(), Toast.LENGTH_SHORT).show();
+
+            }
+
+            @NonNull
+            @Override
+            public DiplomaAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return null;
+            }
+        };
+
+
         return view;
     }
 
@@ -221,20 +244,25 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
                 && !promo_youtube.getText().toString().equals("")) {
             //numberOfDiploma
             if (nameDiplomaSpinner.equals("Web")) {
-                String pushId = referenceWeb.push().getKey().toString();
-                referenceWeb.child(pushId).updateChildren(map);
-                WebPlayList(pushId);
+                String CompositeId = nameOfDevelpoer.getText().toString() + ":" + nameDiplomaSpinner + ":" + numberOfDiploma.getText().toString() + ":" + date.getTime();
+                referenceWeb.child(CompositeId).updateChildren(map);
+                referenceAllPlayLists.child(CompositeId).updateChildren(map);
+                WebPlayList(CompositeId);
             } else if (nameDiplomaSpinner.equals("Mobile")) {
-                String pushId = referenceMobile.push().getKey().toString();
-                referenceMobile.child(pushId).updateChildren(map);
-                MobilePlayList(pushId);
+                String CompositeId = nameOfDevelpoer.getText().toString() + ":" + nameDiplomaSpinner + ":" + numberOfDiploma.getText().toString() + ":" + date.getTime();
+                referenceMobile.child(CompositeId).updateChildren(map);
+                referenceAllPlayLists.child(CompositeId).updateChildren(map);
+                MobilePlayList(CompositeId);
             } else if (nameDiplomaSpinner.equals("graphicDesign")) {
-                String pushId = referenceGraphicDesign.push().getKey().toString();
-                referenceGraphicDesign.child(pushId).updateChildren(map);
-                GraphicPlayList(pushId);
+                String CompositeId = nameOfDevelpoer.getText().toString() + ":" + nameDiplomaSpinner + ":" + numberOfDiploma.getText().toString() + ":" + date.getTime();
+                referenceGraphicDesign.child(CompositeId).updateChildren(map);
+                referenceAllPlayLists.child(CompositeId).updateChildren(map);
+                GraphicPlayList(CompositeId);
             }
             Toast.makeText(getContext(), "Done", Toast.LENGTH_LONG).show();
         }
+
+
     }
 
     private void openGallery() {
@@ -264,9 +292,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         progressDialog.setMessage("Uploading");
         progressDialog.show();
         if (imageUri != null) {
-            final StorageReference fileReference = storageReference.child(System.currentTimeMillis()
-                    + "." + getFileExtension(imageUri));
-
+            final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
             uploadTask = fileReference.putFile(imageUri);
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
@@ -274,7 +300,6 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
                     if (!task.isSuccessful()) {
                         throw task.getException();
                     }
-
                     return fileReference.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -292,7 +317,6 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
                                 && !promo_youtube.getText().toString().equals("")) {
                             if (!nameOfDevelpoer.getText().toString().equals("")) {
                                 map.put("NameOfDevelpoer", "" + nameOfDevelpoer.getText().toString());
-
                             } else {
                                 Toast.makeText(getContext(), "Name of Delveloper", Toast.LENGTH_LONG).show();
                             }
@@ -319,17 +343,20 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
                             map.put("imageOfDiploma", "" + mUri);
                             map.put("promo_youtube", promo_youtube.getText().toString());
                             if (nameDiplomaSpinner.equals("Web")) {
-                                String pushId = referenceGraphicDesign.push().getKey().toString();
-                                referenceWeb.child(pushId).updateChildren(map);
-                                WebPlayList(pushId);
+                                String CompositeId = nameOfDevelpoer.getText().toString() + ":" + nameDiplomaSpinner + ":" + numberOfDiploma.getText().toString() + ":" + date.getTime();
+                                referenceWeb.child(CompositeId).updateChildren(map);
+                                referenceAllPlayLists.child(CompositeId).updateChildren(map);
+                                WebPlayList(CompositeId);
                             } else if (nameDiplomaSpinner.equals("Mobile")) {
-                                String pushId = referenceGraphicDesign.push().getKey().toString();
-                                referenceMobile.child(pushId).updateChildren(map);
-                                MobilePlayList(pushId);
+                                String CompositeId = nameOfDevelpoer.getText().toString() + ":" + nameDiplomaSpinner + ":" + numberOfDiploma.getText().toString() + ":" + date.getTime();
+                                referenceMobile.child(CompositeId).updateChildren(map);
+                                referenceAllPlayLists.child(CompositeId).updateChildren(map);
+                                MobilePlayList(CompositeId);
                             } else if (nameDiplomaSpinner.equals("graphicDesign")) {
-                                String pushId = referenceGraphicDesign.push().getKey().toString();
-                                referenceGraphicDesign.child(pushId).updateChildren(map);
-                                GraphicPlayList(pushId);
+                                String CompositeId = nameOfDevelpoer.getText().toString() + ":" + nameDiplomaSpinner + ":" + numberOfDiploma.getText().toString() + ":" + date.getTime();
+                                referenceGraphicDesign.child(CompositeId).updateChildren(map);
+                                referenceAllPlayLists.child(CompositeId).updateChildren(map);
+                                GraphicPlayList(CompositeId);
                             }
                         }
                         progressDialog.dismiss();
@@ -384,6 +411,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         wepMap.put("numberOfDiploma", numberOfDiploma.getText().toString());
         wepMap.put("nameOfDiploma", nameDiplomaSpinner);
         wepMap.put("pushId", pushId);
+        wepMap.put("timestamp", date.getTime());
         if (!HTMLPlayList.getText().toString().isEmpty()) {
             wepMap.put("HTML", HTMLPlayList.getText().toString().trim());
 
@@ -419,8 +447,9 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         referenceWeb.child(pushId).updateChildren(wepMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(getContext(),"Uploaded",Toast.LENGTH_LONG).show();
+                if (task.isSuccessful()) {
+                    referenceAllPlayLists.child(pushId).updateChildren(wepMap);
+                    Toast.makeText(getContext(), "Uploaded", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -431,6 +460,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         mobileMap.put("numberOfDiploma", numberOfDiploma.getText().toString());
         mobileMap.put("nameOfDiploma", nameDiplomaSpinner);
         mobileMap.put("pushId", pushId);
+        mobileMap.put("timestamp", date.getTime());
         if (!JavaPlayList.getText().toString().isEmpty() && !JavaPlayList.getText().toString().equals("")) {
             mobileMap.put("Java", JavaPlayList.getText().toString().trim());
 
@@ -450,8 +480,9 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         referenceMobile.child(pushId).updateChildren(mobileMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(getContext(),"Uploaded",Toast.LENGTH_LONG).show();
+                if (task.isSuccessful()) {
+                    referenceAllPlayLists.child(pushId).updateChildren(mobileMap);
+                    Toast.makeText(getContext(), "Uploaded", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -462,6 +493,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         graphicMap.put("numberOfDiploma", numberOfDiploma.getText().toString());
         graphicMap.put("nameOfDiploma", nameDiplomaSpinner);
         graphicMap.put("pushId", pushId);
+        graphicMap.put("timestamp", date.getTime());
         if (!PhotoshopPlayList.getText().toString().isEmpty()) {
             graphicMap.put("Photoshop", PhotoshopPlayList.getText().toString().trim());
 
@@ -489,10 +521,19 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         referenceGraphicDesign.child(pushId).updateChildren(graphicMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                    Toast.makeText(getContext(),"Uploaded",Toast.LENGTH_LONG).show();
+                if (task.isSuccessful()) {
+                    referenceAllPlayLists.child(pushId).updateChildren(graphicMap);
+                    Toast.makeText(getContext(), "Uploaded", Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    private class DiplomaAdapter extends RecyclerView.ViewHolder {
+        public DiplomaAdapter(@NonNull View itemView) {
+            super(itemView);
+
+
+        }
     }
 }

@@ -32,7 +32,7 @@ public class MainViewModel extends ViewModel implements DiplomaRepository.Listen
     private DiplomaRepository diplomaRepository = new DiplomaRepository(this);
 
     public MainViewModel() {
-//        diplomaRepository.AllDiploma();
+        diplomaRepository.AllDiploma();
     }
 
     public LiveData<ArrayList<Diploma>> getLiveData() {

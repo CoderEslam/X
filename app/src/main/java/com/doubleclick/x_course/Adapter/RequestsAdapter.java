@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.doubleclick.x_course.Model.Request;
 import com.doubleclick.x_course.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -29,13 +30,16 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
     private ArrayList<Request> requestArrayList = new ArrayList<>();
     private DatabaseReference RequestReference;
     private DatabaseReference EmailsReference;
+    private FirebaseAuth mAuth;
+    private String UserId;
 
 
     public RequestsAdapter(ArrayList<Request> requestArrayList) {
         this.requestArrayList = requestArrayList;
         RequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
         EmailsReference = FirebaseDatabase.getInstance().getReference().child("Emails");
-
+        mAuth = FirebaseAuth.getInstance();
+        UserId = mAuth.getCurrentUser().getUid().toString();
     }
 
     @NonNull
@@ -60,7 +64,9 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
             mapEmail.put("numberOfDiploma", request.getNumberOfDiploma());
             mapEmail.put("track", request.getTrack()); // spinner
             mapEmail.put("PushId", PushId);
+            mapEmail.put("UserId",UserId);
             EmailsReference.child(PushId).setValue(mapEmail);
+            EmailsReference.child(request.getPushId()).child(UserId).setValue(true);
             RequestReference.child(request.getPushId()).removeValue();
             holder.animationReject.setVisibility(View.GONE);
             holder.animationAccept.setVisibility(View.GONE);

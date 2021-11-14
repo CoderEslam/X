@@ -44,6 +44,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
+    implementation 'com.firebaseui:firebase-ui-database:3.2.2'
 
     //Custom Navigation Darwer
     implementation 'com.yarolegovich:sliding-root-nav:1.1.1'

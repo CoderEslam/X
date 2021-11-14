@@ -31,7 +31,12 @@ public class DiplomaRepository {
         referenceAllPlayList.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {
-                for (int i = 1; i < 1000; i++) { // TODO => 100 indicate to the numbers of all diplomas
+                for (DataSnapshot dataSnapshot:snapshot.getChildren()){
+                    Diploma diploma = dataSnapshot.getValue(Diploma.class);
+                    diplomasArrayList.add(diploma);
+                    InterfaceListener.ClickListener(diplomasArrayList);
+                }
+               /* for (int i = 1; i < 1000; i++) { // TODO => 100 indicate to the numbers of all diplomas
 //                    Toast.makeText(getContext(), "getChildrenCount = " + snapshot.getChildrenCount(), Toast.LENGTH_LONG).show();
                     if (snapshot.child("Mobile").hasChild("Mobile" + i)) {
                         referenceAllPlayList.child("Mobile")
@@ -77,7 +82,7 @@ public class DiplomaRepository {
                                     }
                                 });
                     }
-                }
+                }*/
             }
         });
         return diplomasArrayList;
