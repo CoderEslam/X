@@ -66,7 +66,6 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
             mapEmail.put("PushId", PushId);
             mapEmail.put("UserId",UserId);
             EmailsReference.child(PushId).setValue(mapEmail);
-            EmailsReference.child(request.getPushId()).child(UserId).setValue(true);
             RequestReference.child(request.getPushId()).removeValue();
             holder.animationReject.setVisibility(View.GONE);
             holder.animationAccept.setVisibility(View.GONE);
