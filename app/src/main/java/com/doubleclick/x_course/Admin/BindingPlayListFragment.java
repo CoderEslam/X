@@ -194,21 +194,7 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         });
 
         //https://firebaseopensource.com/projects/firebase/firebaseui-android/database/readme/
-        FirebaseRecyclerOptions<Diploma> options = new FirebaseRecyclerOptions.Builder<Diploma>().setQuery(referenceAllPlayLists, Diploma.class).build();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Diploma, DiplomaAdapter>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull DiplomaAdapter diplomaAdapter, int i, @NonNull Diploma diploma) {
 
-                Toast.makeText(getContext(), "This is  = " + diploma.toString(), Toast.LENGTH_SHORT).show();
-
-            }
-
-            @NonNull
-            @Override
-            public DiplomaAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return null;
-            }
-        };
 
 
         return view;
@@ -529,11 +515,5 @@ public class BindingPlayListFragment extends Fragment implements AdapterView.OnI
         });
     }
 
-    private class DiplomaAdapter extends RecyclerView.ViewHolder {
-        public DiplomaAdapter(@NonNull View itemView) {
-            super(itemView);
 
-
-        }
-    }
 }

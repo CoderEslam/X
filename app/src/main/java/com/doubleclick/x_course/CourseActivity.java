@@ -125,7 +125,7 @@ public class CourseActivity extends YouTubeBaseActivity {
         });
 
     }
-
+// https://www.simplifiedcoding.net/firebase-cloud-messaging-android/
     @Override
     public void finish() {
         super.finish();
@@ -199,7 +199,7 @@ public class CourseActivity extends YouTubeBaseActivity {
         if (mListData != null) {
             loadingAnimView.setVisibility(View.GONE);
             // ToDo if ()nameofdiploma==web{..............}
-            homePages.add(new HomePage(0, mListData));
+            homePages.add(new HomePage(2, mListData));
             homePageAdapter = new HomePageAdapter(homePages);
             allVideos.setAdapter(homePageAdapter);
             homePageAdapter.notifyDataSetChanged();

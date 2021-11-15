@@ -38,8 +38,12 @@ import com.doubleclick.x_course.ViewModel.GraphicDesignViewModel;
 import com.doubleclick.x_course.ViewModel.MainViewModel;
 import com.doubleclick.x_course.ViewModel.MobileViewModel;
 import com.doubleclick.x_course.ViewModel.WebViewModel;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.todkars.shimmer.ShimmerRecyclerView;
 
 import java.util.ArrayList;
@@ -70,6 +74,7 @@ public class MainFragment extends Fragment {
     private GraphicDesignViewModel graphicDesignViewModel;
     private ShimmerRecyclerView main_courses;
     LifecycleOwner lifecycleOwner;
+    private DatabaseReference referenceAllPlayLists;
     ViewModelStoreOwner viewModelStoreOwner;
 //    private Toolbar toolbar;
 
@@ -120,7 +125,7 @@ public class MainFragment extends Fragment {
         mobileViewModel = new ViewModelProvider(this).get(MobileViewModel.class);
         webViewModel = new ViewModelProvider(this).get(WebViewModel.class);
         graphicDesignViewModel = new ViewModelProvider(this).get(GraphicDesignViewModel.class);
-
+        referenceAllPlayLists = FirebaseDatabase.getInstance().getReference().child("AllPlayLists");
         main_courses = view.findViewById(R.id.main_courses);
         recycler_Advertisement = view.findViewById(R.id.recycler_Advertisement);
         MainRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -222,7 +227,32 @@ public class MainFragment extends Fragment {
             }
         });
         main_courses.setAdapter(itemCourseAdapter);
+
+
+        FirebaseRecyclerOptions<Diploma> options = new FirebaseRecyclerOptions.Builder<Diploma>().setQuery(referenceAllPlayLists, Diploma.class).build();
+        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Diploma, DiplomaAdapter>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull DiplomaAdapter diplomaAdapter, int i, @NonNull Diploma diploma) {
+
+                Toast.makeText(getContext(), "This is  = " + diploma.toString(), Toast.LENGTH_SHORT).show();
+
+            }
+
+            @NonNull
+            @Override
+            public DiplomaAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return null;
+            }
+        };
         return view;
+    }
+
+    private class DiplomaAdapter extends RecyclerView.ViewHolder {
+        public DiplomaAdapter(@NonNull View itemView) {
+            super(itemView);
+
+
+        }
     }
 
 

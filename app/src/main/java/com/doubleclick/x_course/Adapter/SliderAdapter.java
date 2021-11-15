@@ -35,7 +35,12 @@ public class SliderAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return sliderModelList.size();
+        try {
+            return sliderModelList.size();
+        }catch (NullPointerException e){
+            return 0;
+        }
+
     }
 
     @Override

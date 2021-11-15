@@ -10,6 +10,7 @@ public class HomePage {
 
     public static final int Advertisement = 0;
     public static final int AllDiploma = 1;
+    public static final int ItemCourse = 2;
 
 
     private String email;

@@ -119,11 +119,15 @@ public class AboutCourseActivity extends AppCompatActivity {
                 } else {
                     tv_lastPrice.setText(last_Price);
                     tv_newPrice.setText(new_Price);
-                    if (url_animation.equals("")) {
-                        animationDiscount.setVisibility(View.GONE);
-                    } else {
-                        animationDiscount.setVisibility(View.VISIBLE);
-                        animationDiscount.setAnimationFromUrl(url_animation);
+                    try {
+                        if (url_animation.equals("")) {
+                            animationDiscount.setVisibility(View.GONE);
+                        } else {
+                            animationDiscount.setVisibility(View.VISIBLE);
+                            animationDiscount.setAnimationFromUrl(url_animation);
+                        }
+                    }catch (NullPointerException e){
+
                     }
 
                 }

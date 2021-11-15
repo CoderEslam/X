@@ -190,6 +190,8 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                 holder.join.setText("Delete");
                 holder.join.setEnabled(true);
                 String PushId = UserId + ":" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma();
+                String DiplomaId = diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer() + ":" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getTimestamp();
+
                 Map<String, Object> mapRequest = new HashMap<>();
                 mapRequest.put("nameOfDiploma", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
                 mapRequest.put("numberOfDiploma", diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
@@ -200,6 +202,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                 mapRequest.put("timestamp", diplomas.get(holder.getAdapterPosition()).getTimestamp());
                 mapRequest.put("NameOfDevelpoer", diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer());
                 mapRequest.put("PushId", PushId);//it's Id in data
+                mapRequest.put("DiplomaId", DiplomaId);
                 keyJoin = "Delete";
                 RequestRef.child(PushId).updateChildren(mapRequest).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

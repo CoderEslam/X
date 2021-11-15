@@ -7,19 +7,17 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+
 import com.doubleclick.x_course.Model.Advertisement;
 import com.doubleclick.x_course.Model.Diploma;
 import com.doubleclick.x_course.Model.HomePage;
 import com.doubleclick.x_course.Model.YouTubeDataModel;
 import com.doubleclick.x_course.R;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -44,8 +42,11 @@ public class HomePageAdapter extends RecyclerView.Adapter {
                 View bannerSliderView = LayoutInflater.from(parent.getContext()).inflate(R.layout.slids_ad_banner, parent, false);
                 return new BannerSliderViewholder(bannerSliderView);
             case HomePage.AllDiploma://1
-                View item_diplomaView = LayoutInflater.from(parent.getContext()).inflate(R.layout.h_s_recycler_view, parent, false);
+                View item_diplomaView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_item_diploma, parent, false);
                 return new DiplomaViewHolder(item_diplomaView);
+            case HomePage.ItemCourse://2
+                View item_VideoView = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_item_video, parent, false);
+                return new ItemVideoViewHolder(item_VideoView);
             default:
                 return null;
         }
@@ -66,7 +67,12 @@ public class HomePageAdapter extends RecyclerView.Adapter {
                 String id = homePageList.get(position).getUserId();
                 String image = homePageList.get(position).getImageURL();
                 String email = homePageList.get(position).getEmail();
-                ((DiplomaViewHolder) holder).setDiploma(AllDiploma,name,id,image,email);
+                ((DiplomaViewHolder) holder).setDiploma(AllDiploma, name, id, image, email);
+                break;
+
+            case HomePage.ItemCourse://2
+                ArrayList<YouTubeDataModel> youTubeDataModels = homePageList.get(position).getYouTubeDataModelList();
+                ((ItemVideoViewHolder) holder).setVideo(youTubeDataModels);
                 break;
 
         }
@@ -85,22 +91,41 @@ public class HomePageAdapter extends RecyclerView.Adapter {
                 return HomePage.Advertisement;//0
             case 1:
                 return HomePage.AllDiploma;//1
+            case 2:
+                return HomePage.ItemCourse;//2
             default:
                 return -1;
         }
     }
 
 
-    public class DiplomaViewHolder extends  RecyclerView.ViewHolder{
+    public class DiplomaViewHolder extends RecyclerView.ViewHolder {
         public RecyclerView h_s_Recycler_Scroll;
+
         public DiplomaViewHolder(@NonNull View itemView) {
             super(itemView);
             h_s_Recycler_Scroll = itemView.findViewById(R.id.h_s_Recycler_Scroll);
         }
 
-        public void setDiploma(ArrayList<Diploma> allDiploma,String name,String id, String image,String email){
-            DiplomasAdapter diplomasAdapter = new DiplomasAdapter(allDiploma,email,id,name,image, itemView.getContext());
+        public void setDiploma(ArrayList<Diploma> allDiploma, String name, String id, String image, String email) {
+            DiplomasAdapter diplomasAdapter = new DiplomasAdapter(allDiploma, email, id, name, image, itemView.getContext());
             h_s_Recycler_Scroll.setAdapter(diplomasAdapter);
+        }
+
+
+    }
+
+    public class ItemVideoViewHolder extends RecyclerView.ViewHolder {
+        public RecyclerView Rec_All_Video;
+
+        public ItemVideoViewHolder(@NonNull View itemView) {
+            super(itemView);
+            Rec_All_Video = itemView.findViewById(R.id.Rec_All_Video);
+        }
+
+        public void setVideo(ArrayList<YouTubeDataModel> allVideo) {
+            VideosPostVarticalAdapter videosPostVarticalAdapter = new VideosPostVarticalAdapter(allVideo);
+            Rec_All_Video.setAdapter(videosPostVarticalAdapter);
         }
 
 
@@ -166,24 +191,30 @@ public class HomePageAdapter extends RecyclerView.Adapter {
 
         // this resbonsable to loop slider
         private void StartbannerSlideShow(final List<Advertisement> advertisementList) {
-            final Handler handler = new Handler();
-            final Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (currentPage >= advertisementList.size()) {
-                        currentPage = 0;
-                    }
+            try {
+                final Handler handler = new Handler();
+                final Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
 
-                    bannerSliderViewPager.setCurrentItem(currentPage++);
-                }
-            };
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    handler.post(runnable);
-                }
-            }, DELAY_TIME, PERIOD_TIME);
+                        if (currentPage >= advertisementList.size()) {
+                            currentPage = 0;
+                        }
+
+                        bannerSliderViewPager.setCurrentItem(currentPage++);
+                    }
+                };
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        handler.post(runnable);
+                    }
+                }, DELAY_TIME, PERIOD_TIME);
+            } catch (NullPointerException e) {
+                Log.e("HomePagerAdapter : ", e.getMessage());
+            }
+
         }
 
         private void StopBannerSlideShow() {
