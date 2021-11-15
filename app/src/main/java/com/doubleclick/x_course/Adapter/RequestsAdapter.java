@@ -55,16 +55,16 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
         Glide.with(holder.itemView.getContext()).load(request.getImageURL()).placeholder(R.drawable.account_circle_24).into(holder.RequestImage);
         holder.RequestName.setText(request.getUsername());
         holder.TrackRequest.setText(request.getTrack());
-
         holder.animationAccept.setOnClickListener(view -> {
             Map mapEmail = new HashMap();
             String PushId = request.getUserId()+":"+request.getNameOfDiploma()+":"+request.getTrack()+":"+request.getNumberOfDiploma();
+            String DiplomaId = request.getNameOfDevelpoer()+":"+request.getNameOfDiploma()+":"+request.getNumberOfDiploma()+":"+request.getTimestamp();
             mapEmail.put("diploma", request.getNameOfDiploma());
-            mapEmail.put("email", request.getEmail());
             mapEmail.put("numberOfDiploma", request.getNumberOfDiploma());
             mapEmail.put("track", request.getTrack()); // spinner
             mapEmail.put("PushId", PushId);
             mapEmail.put("UserId",UserId);
+            mapEmail.put("DiplomaId",DiplomaId);
             EmailsReference.child(PushId).setValue(mapEmail);
             RequestReference.child(request.getPushId()).removeValue();
             holder.animationReject.setVisibility(View.GONE);

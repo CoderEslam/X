@@ -15,8 +15,8 @@ public class LoadYouTubeViewModel extends ViewModel implements LoadDataRepositor
 
     MutableLiveData<ArrayList<YouTubeDataModel>> arrayListMutableLiveData = new MutableLiveData<>();
 
-    public void Getter(String name, String number, String email) {
-        LoadDataRepository loadDataRepository = new LoadDataRepository(this, name, number, email);
+    public void Getter(String name, String number, String email,String nameDeveloper,String timestamp) {
+        LoadDataRepository loadDataRepository = new LoadDataRepository(this, name, number, email,nameDeveloper,timestamp);
         loadDataRepository.loadUserData();
     }
 

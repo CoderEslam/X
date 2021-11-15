@@ -51,6 +51,7 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
         Toolbar toolbar = findViewById(R.id.toolbar3);
+        setTitle("");
         setSupportActionBar(toolbar);
         builder = new AlertDialog.Builder(this);
         tabLayout = findViewById(R.id.tab_layout);

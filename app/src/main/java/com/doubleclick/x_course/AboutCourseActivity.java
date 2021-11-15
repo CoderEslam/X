@@ -45,7 +45,8 @@ public class AboutCourseActivity extends AppCompatActivity {
             about_course,
             numberOfDiploma,
             promo_youtube = "",
-            email, keyJoin;
+            email, keyJoin,
+            timestamp;
     private boolean check;
     private static String GOOGLE_YOUTUBE_API_KEY = "AIzaSyB-c6ay-9BkRmdltEFr-zpSjNj6XPmvNuc";//here you should use your api key for testing purpose you can use this api also
     private LoadYouTubeViewModel loadYouTubeViewModel;
@@ -70,6 +71,7 @@ public class AboutCourseActivity extends AppCompatActivity {
             last_Price = getIntent().getStringExtra("lastPrice");
             about_course = getIntent().getStringExtra("aboutCourses");
             new_Price = getIntent().getStringExtra("newPrice");
+            timestamp = getIntent().getStringExtra("timestamp");
             url_animation = getIntent().getStringExtra("animationDiscount");
             numberOfDiploma = getIntent().getStringExtra("numberOfDiploma");
             promo_youtube = getIntent().getStringExtra("promo_youtube");
@@ -89,7 +91,7 @@ public class AboutCourseActivity extends AppCompatActivity {
             });
             if (check && keyJoin.equals("Watch")) {
                 loadYouTubeViewModel = new ViewModelProvider(this).get(LoadYouTubeViewModel.class);
-                loadYouTubeViewModel.Getter(name_Diplomat, numberOfDiploma, email);
+                loadYouTubeViewModel.Getter(name_Diplomat, numberOfDiploma, email,name_Developer,timestamp);
                 loadYouTubeViewModel.getData().observe(this, new Observer<ArrayList<YouTubeDataModel>>() {
                     @Override
                     public void onChanged(ArrayList<YouTubeDataModel> youTubeDataModels) {

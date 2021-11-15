@@ -11,6 +11,34 @@ public class Request {
     private String numberOfDiploma;
     private String nameOfDiploma;
     private String PushId;
+    private String NameOfDevelpoer;
+    private String timestamp;
+    private String DiplomaId;
+
+    public String getDiplomaId() {
+        return DiplomaId;
+    }
+
+    public void setDiplomaId(String diplomaId) {
+        DiplomaId = diplomaId;
+    }
+
+
+    public String getNameOfDevelpoer() {
+        return NameOfDevelpoer;
+    }
+
+    public void setNameOfDevelpoer(String nameOfDevelpoer) {
+        NameOfDevelpoer = nameOfDevelpoer;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 
 
     public String getPushId() {

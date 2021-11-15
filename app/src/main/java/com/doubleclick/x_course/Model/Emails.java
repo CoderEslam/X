@@ -3,20 +3,30 @@ package com.doubleclick.x_course.Model;
 public class Emails {
 
 
-
     private String email;
     private String diploma;
     private String numberOfDiploma;
     private int type;
     private String track;
-    private String ID;
+    private String UserId;
+    private String DiplomaId;
 
-    public String getID() {
-        return ID;
+
+    public String getUserId() {
+        return UserId;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setUserId(String userId) {
+        UserId = userId;
+    }
+
+
+    public String getDiplomaId() {
+        return DiplomaId;
+    }
+
+    public void setDiplomaId(String diplomaId) {
+        DiplomaId = diplomaId;
     }
 
 
@@ -29,8 +39,6 @@ public class Emails {
     }
 
 
-
-
     public int getType() {
         return type;
     }
@@ -38,7 +46,6 @@ public class Emails {
     public void setType(int type) {
         this.type = type;
     }
-
 
 
     public Emails() {

@@ -9,6 +9,7 @@ import com.doubleclick.x_course.Model.Diploma;
 import com.doubleclick.x_course.Model.Emails;
 import com.doubleclick.x_course.Model.YouTubeDataModel;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,16 +35,22 @@ public class LoadDataRepository {
 
     private DatabaseReference EmailsRef;
     private DatabaseReference AllPlayListsReferanc;
-    private String name_Diplomat, numberOfDiploma, user_email;
+    private String name_Diplomat, numberOfDiploma, user_email,timestamp,NameDeveloper;
+    private FirebaseAuth mAuth;
+    private String UserId;
     private static String GOOGLE_YOUTUBE_API_KEY = "AIzaSyB-c6ay-9BkRmdltEFr-zpSjNj6XPmvNuc";//here you should use your api key for testing purpose you can use this api also
 //    private ArrayList<ArrayList<YouTubeDataModel>> YouTubeDataModelArrayLists=new ArrayList<>();
 
 
-    public LoadDataRepository(OnItemClickListener listener, String name_Diplomat, String numberOfDiploma, String user_email) {
+    public LoadDataRepository(OnItemClickListener listener, String name_Diplomat, String numberOfDiploma, String user_email,String NameDeveloper,String timestamp) {
         onItemClickListener = listener;
         this.name_Diplomat = name_Diplomat;
         this.numberOfDiploma = numberOfDiploma;
         this.user_email = user_email;
+        this.timestamp = timestamp;
+        this.NameDeveloper = NameDeveloper;
+        mAuth = FirebaseAuth.getInstance();
+        UserId = mAuth.getCurrentUser().getUid().toString();
     }
 
 
@@ -55,11 +62,8 @@ public class LoadDataRepository {
             public void onSuccess(DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Emails email = dataSnapshot.getValue(Emails.class);
-                    if (email.getEmail().equals(user_email)) {
-                        AllPlayListsReferanc.child(name_Diplomat) //Android
-                                .child(name_Diplomat + numberOfDiploma)//Android7
-                                .child(name_Diplomat)//Android
-                                .addValueEventListener(new ValueEventListener() {
+                    if (email.getUserId().equals(UserId)) {
+                        AllPlayListsReferanc.child(NameDeveloper+":"+name_Diplomat+":"+numberOfDiploma+":"+timestamp).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         Log.e("LoadDataRepository", name_Diplomat + numberOfDiploma + name_Diplomat);

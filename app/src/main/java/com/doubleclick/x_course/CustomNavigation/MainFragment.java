@@ -197,7 +197,7 @@ public class MainFragment extends Fragment {
                     mobileViewModel.getMobileData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                         @Override
                         public void onChanged(ArrayList<Diploma> diplomas) {
-                            Toast.makeText(getContext(), "" + diplomas.toString(), Toast.LENGTH_LONG).show();
+                            LoadAllDiplomas(diplomas);
                         }
                     });
                 }else if (holder.getAdapterPosition()==1){
@@ -205,8 +205,7 @@ public class MainFragment extends Fragment {
                     webViewModel.getWebData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                         @Override
                         public void onChanged(ArrayList<Diploma> diplomas) {
-                            Toast.makeText(getContext(), "" + diplomas.toString(), Toast.LENGTH_LONG).show();
-//                            LoadAllDiplomas(diplomas);
+                            LoadAllDiplomas(diplomas);
                         }
                     });
                 }else if (postion==2){
@@ -214,7 +213,7 @@ public class MainFragment extends Fragment {
                     graphicDesignViewModel.getGraphicDesign().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                         @Override
                         public void onChanged(ArrayList<Diploma> diplomas) {
-                            Toast.makeText(getContext(), "" + diplomas.toString(), Toast.LENGTH_LONG).show();
+                            LoadAllDiplomas(diplomas);
 
                         }
                     });
