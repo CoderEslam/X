@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,90 +75,96 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Drawe
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
     private Toolbar toolbar;
-    private String UserId = null;
+    private String UserId;
     private ConnectivityManager connectivityManager;
     private NetworkInfo networkInfo;
     private LottieAnimationView animation_no_wifi;
     private MobileViewModel mobileViewModel;
     private WebViewModel webViewModel;
     private GraphicDesignViewModel graphicDesignViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         networkInfo = connectivityManager.getActiveNetworkInfo();
-        mAuth = FirebaseAuth.getInstance();
         animation_no_wifi = findViewById(R.id.animation_no_wifi);
-        if (UserId != null && mAuth != null && networkInfo != null && networkInfo.isConnected()) {
-            userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-            animation_no_wifi.setVisibility(View.GONE);
-            toolbar = findViewById(R.id.toolbar);
-            toolbar.setTitle("Courses");
-            setSupportActionBar(toolbar);
-            userViewModel.getUserLiveData().observe(this, new Observer<User>() {
-                @Override
-                public void onChanged(User user) {
-                    try {
-                        MainFragment mainFragment = new MainFragment();
-                        if (user.getEmail() != null) {
-                            mainFragment.newInstance(user.getEmail(), user.getId(), user.getUsername(), user.getImageURL());
-                            UserId = user.getId();
-                        }
-                        TextView nameProfile = findViewById(R.id.profileName);
-                        CircleImageView profileImage = findViewById(R.id.profileImage);
-                        nameProfile.setText(user.getUsername());
+        mAuth = FirebaseAuth.getInstance();
+        if (networkInfo != null && networkInfo.isConnected() && mAuth != null) {
+            try {
+
+
+                userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                animation_no_wifi.setVisibility(View.GONE);
+                toolbar = findViewById(R.id.toolbar);
+                toolbar.setTitle("Courses");
+                setSupportActionBar(toolbar);
+                userViewModel.getUserLiveData().observe(this, new Observer<User>() {
+                    @Override
+                    public void onChanged(User user) {
                         try {
-                            if (user.getImageURL().equals("default")) {
-                                Toast.makeText(NavigationDrawerActivity.this, "put an image profile", Toast.LENGTH_LONG).show();
-                                getSupportFragmentManager().beginTransaction().replace(R.id.container, new AccountFragment()).commit();
-                            } else {
-                                Glide.with(NavigationDrawerActivity.this).load(user.getImageURL())
-                                        .placeholder(R.drawable.account_circle_24)
-                                        .into(profileImage);
+                            MainFragment mainFragment = new MainFragment();
+                            if (user.getEmail() != null) {
+                                mainFragment.newInstance(user.getEmail(), user.getId(), user.getUsername(), user.getImageURL());
+                                UserId = user.getId();
                             }
-                        } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
+                            TextView nameProfile = findViewById(R.id.profileName);
+                            CircleImageView profileImage = findViewById(R.id.profileImage);
+                            nameProfile.setText(user.getUsername());
+                            try {
+                                if (user.getImageURL().equals("default")) {
+                                    Toast.makeText(NavigationDrawerActivity.this, "put an image profile", Toast.LENGTH_LONG).show();
+                                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new AccountFragment()).commit();
+                                } else {
+                                    Glide.with(NavigationDrawerActivity.this).load(user.getImageURL())
+                                            .placeholder(R.drawable.account_circle_24)
+                                            .into(profileImage);
+                                }
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (NullPointerException e) {
+                            Toast.makeText(NavigationDrawerActivity.this, "Error", Toast.LENGTH_LONG).show();
                         }
-                    } catch (NullPointerException e) {
-                        Toast.makeText(NavigationDrawerActivity.this, "Error", Toast.LENGTH_LONG).show();
                     }
-                }
-            });
+                });
 
 
-            slidingRootNav = new SlidingRootNavBuilder(this)
-                    .withToolbarMenuToggle(toolbar)
-                    .withMenuOpened(false)
-                    .withContentClickableWhenMenuOpened(false)
-                    .withSavedState(savedInstanceState)
-                    .withMenuLayout(R.layout.menu_left_drawer)
-                    .inject();
+                slidingRootNav = new SlidingRootNavBuilder(this)
+                        .withToolbarMenuToggle(toolbar)
+                        .withMenuOpened(false)
+                        .withContentClickableWhenMenuOpened(false)
+                        .withSavedState(savedInstanceState)
+                        .withMenuLayout(R.layout.menu_left_drawer)
+                        .inject();
 
-            screenIcons = loadScreenIcons();
-            screenTitles = loadScreenTitles();
-            DrawerAdapter adapter = new DrawerAdapter(Arrays.asList(
-                    createItemFor(POS_MAIN_COURSE_FRAGMENT).setChecked(true), //setChecked(true) => to set selected
-                    createItemFor(POS_ACCOUNT),
-                    createItemFor(POS_CHAT),
-                    createItemFor(POS_HELP),
-                    createItemFor(POS_ABOUT),
-                    //new SpaceItem(48), // for space between items.
-                    createItemFor(POS_ADMIN),
-                    createItemFor(POS_LOGOUT)));
-            adapter.setListener(this);
+                screenIcons = loadScreenIcons();
+                screenTitles = loadScreenTitles();
+                DrawerAdapter adapter = new DrawerAdapter(Arrays.asList(
+                        createItemFor(POS_MAIN_COURSE_FRAGMENT).setChecked(true), //setChecked(true) => to set selected
+                        createItemFor(POS_ACCOUNT),
+                        createItemFor(POS_CHAT),
+                        createItemFor(POS_HELP),
+                        createItemFor(POS_ABOUT),
+                        //new SpaceItem(48), // for space between items.
+                        createItemFor(POS_ADMIN),
+                        createItemFor(POS_LOGOUT)));
+                adapter.setListener(this);
 
-            RecyclerView list = findViewById(R.id.list);
-            list.setNestedScrollingEnabled(false);
-            list.setLayoutManager(new LinearLayoutManager(this));
-            list.setAdapter(adapter);
-            //to selected it during opening
-            adapter.setSelected(POS_MAIN_COURSE_FRAGMENT);
-
-
+                RecyclerView list = findViewById(R.id.list);
+                list.setNestedScrollingEnabled(false);
+                list.setLayoutManager(new LinearLayoutManager(this));
+                list.setAdapter(adapter);
+                //to selected it during opening
+                adapter.setSelected(POS_MAIN_COURSE_FRAGMENT);
+            } catch (NullPointerException e) {
+                Log.e("NavigationDrawerActivity: ",e.getMessage());
+            }
         } else {
             animation_no_wifi.setVisibility(View.VISIBLE);
         }
+
 
     }
 

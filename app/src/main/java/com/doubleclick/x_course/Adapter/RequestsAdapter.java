@@ -63,7 +63,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
             mapEmail.put("numberOfDiploma", request.getNumberOfDiploma());
             mapEmail.put("track", request.getTrack()); // spinner
             mapEmail.put("PushId", PushId);
-            mapEmail.put("UserId",UserId);
+            mapEmail.put("UserId",request.getUserId());
             mapEmail.put("DiplomaId",DiplomaId);
             EmailsReference.child(PushId).setValue(mapEmail);
             RequestReference.child(request.getPushId()).removeValue();

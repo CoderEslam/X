@@ -4,9 +4,17 @@ package com.doubleclick.x_course;
 import static com.doubleclick.x_course.AboutCourseActivity.AllYouTubeArrayLists;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -26,6 +34,7 @@ import com.doubleclick.x_course.FolatingLayout.callback.FloatingListener;
 import com.doubleclick.x_course.Model.Emails;
 import com.doubleclick.x_course.Model.HomePage;
 import com.doubleclick.x_course.Model.YouTubeDataModel;
+import com.doubleclick.x_course.ViewModel.LoadYouTubeViewModel;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 
@@ -53,6 +62,11 @@ public class CourseActivity extends YouTubeBaseActivity {
     private int sec;
     private int positionVideoVertical, positionVideoFromVideosHomePageAdapter;
     private String IdVideo, TitelVideo, DescribtionVideo;
+    private LoadYouTubeViewModel loadYouTubeViewModel;
+    LifecycleOwner lifecycleOwner;
+    ViewModelStoreOwner viewModelStoreOwner;
+
+
 //    public static ArrayList<ArrayList<YouTubeDataModel>> AllGivenYouTubeArrayLists = new ArrayList<>();
 
 
@@ -63,11 +77,31 @@ public class CourseActivity extends YouTubeBaseActivity {
         nameOfLectuer = findViewById(R.id.nameOfLectuer);
         Description = findViewById(R.id.Description);
         allVideos = findViewById(R.id.allVideos);
+        try {
+            Fragment fragment = new Fragment();
+            lifecycleOwner = (LifecycleOwner) fragment.getViewLifecycleOwner();
+            viewModelStoreOwner = (ViewModelStoreOwner) fragment.getViewLifecycleOwner();
+        } catch (IllegalStateException e) {
+
+        }
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
         allVideos.setLayoutManager(linearLayoutManager);
         Lectuer = findViewById(R.id.Lectuer);
         loadingAnimView = findViewById(R.id.loadingAnimView);
+        try {
+            loadYouTubeViewModel = new ViewModelProvider(viewModelStoreOwner).get(LoadYouTubeViewModel.class);
+            loadYouTubeViewModel.getData().observe(lifecycleOwner, new Observer<ArrayList<YouTubeDataModel>>() {
+                @Override
+                public void onChanged(ArrayList<YouTubeDataModel> youTubeDataModels) {
+                    Toast.makeText(CourseActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (NullPointerException e) {
+
+        }
+
         try {
             for (int i = 0; i < AllYouTubeArrayLists.size(); i++) {
                 initList(AllYouTubeArrayLists.get(i));
@@ -125,7 +159,8 @@ public class CourseActivity extends YouTubeBaseActivity {
         });
 
     }
-// https://www.simplifiedcoding.net/firebase-cloud-messaging-android/
+
+    // https://www.simplifiedcoding.net/firebase-cloud-messaging-android/
     @Override
     public void finish() {
         super.finish();

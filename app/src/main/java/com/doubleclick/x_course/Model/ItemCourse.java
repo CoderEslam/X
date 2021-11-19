@@ -2,18 +2,27 @@ package com.doubleclick.x_course.Model;
 
 public class ItemCourse {
 
+
+    private int id;
+    private int image_;
+    private String itemCourse;
+    private String ImageDB;
+
+    public String getImageDB() {
+        return ImageDB;
+    }
+
+    public void setImageDB(String imageDB) {
+        ImageDB = imageDB;
+    }
+
+
     public ItemCourse() {
     }
 
     public ItemCourse(int image, String itemCourse) {
         this.image_ = image;
         this.itemCourse = itemCourse;
-    }
-
-    public ItemCourse(int image_, String itemCourse, int bd_item) {
-        this.image_ = image_;
-        this.itemCourse = itemCourse;
-        this.bd_item = bd_item;
     }
 
 
@@ -25,18 +34,15 @@ public class ItemCourse {
         this.image_ = image_;
     }
 
-    private int image_;
-    private String itemCourse;
 
-    public int getBd_item() {
-        return bd_item;
+    public int getId() {
+        return id;
     }
 
-    public void setBd_item(int bd_item) {
-        this.bd_item = bd_item;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    private int bd_item;
 
     public String getItemCourse() {
         return itemCourse;
@@ -47,4 +53,13 @@ public class ItemCourse {
     }
 
 
+    @Override
+    public String toString() {
+        return "ItemCourse{" +
+                "id=" + id +
+                ", image_=" + image_ +
+                ", itemCourse='" + itemCourse + '\'' +
+                ", ImageDB='" + ImageDB + '\'' +
+                '}';
+    }
 }

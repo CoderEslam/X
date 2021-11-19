@@ -21,6 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/tv_Skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -253,6 +254,8 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="-10dp"
+        android:layout_marginEnd="-10dp"
         android:layout_marginBottom="-100dp"
         android:cropToPadding="true"
         android:scaleType="center"

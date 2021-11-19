@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +62,8 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
     private boolean check;
     private Intent AboutIntent;
     private FirebaseAuth mAuth;
+    private ConnectivityManager connectivityManager;
+    private NetworkInfo networkInfo;
 
 
     public DiplomasAdapter(ArrayList<Diploma> diplomas, String email, String UserId, String userName, String imageURL, Context context) {
@@ -72,6 +76,8 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
         referenceRate = FirebaseDatabase.getInstance().getReference().child("Rates");
         referenceEmails = FirebaseDatabase.getInstance().getReference().child("Emails");
         RequestRef = FirebaseDatabase.getInstance().getReference().child("Requests");
+        connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        networkInfo = connectivityManager.getActiveNetworkInfo();
         AboutIntent = new Intent(context, AboutCourseActivity.class);
 
     }
@@ -86,101 +92,103 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
 
     @Override
     public void onBindViewHolder(@NonNull DiplomasAdapter.DiplomasViewHolder holder, int position) {
+        if (mAuth != null && networkInfo != null && networkInfo.isConnected()) {
+            Web = holder.itemView.getResources().getStringArray(R.array.Web);
+            Mobile = holder.itemView.getResources().getStringArray(R.array.Mobile);
+            GraphicDesign = holder.itemView.getResources().getStringArray(R.array.graphicDesign);
+            if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Web")) {
+                ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Web);
+                holder.spinnerTrack.setAdapter(aa);
+            } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
+                Toast.makeText(holder.itemView.getContext(), "" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma(), Toast.LENGTH_SHORT).show();
+                ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Mobile);
+                holder.spinnerTrack.setAdapter(aa);
+            } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {
+                ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, GraphicDesign);
+                holder.spinnerTrack.setAdapter(aa);
+            }
+            try {
+                if (diplomas.get(holder.getAdapterPosition()).getImageOfDiploma() == null || diplomas.get(holder.getAdapterPosition()).getImageOfDiploma().equals("")) {
+                    int[] computer = new int[]{R.raw.computer_science_x, R.raw.programming_computer1, R.raw.man_working_on_computer};
+                    Random random = new Random();
+                    int number = random.nextInt(3);
+                    holder.animation.setAnimation(computer[number]);
+                } else {
+                    Glide.with(holder.itemView.getContext()).load(diplomas.get(holder.getAdapterPosition()).getImageOfDiploma()).placeholder(R.drawable.loading_icon).into(holder.imageOfDiploma);
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
 
-        Web = holder.itemView.getResources().getStringArray(R.array.Web);
-        Mobile = holder.itemView.getResources().getStringArray(R.array.Mobile);
-        GraphicDesign = holder.itemView.getResources().getStringArray(R.array.graphicDesign);
-        if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Web")) {
-            ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Web);
-            holder.spinnerTrack.setAdapter(aa);
-        } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
-            Toast.makeText(holder.itemView.getContext(), "" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma(), Toast.LENGTH_SHORT).show();
-            ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Mobile);
-            holder.spinnerTrack.setAdapter(aa);
-        } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {
-            ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, GraphicDesign);
-            holder.spinnerTrack.setAdapter(aa);
+            holder.nameOfDevelpoer.setText(diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer());
+            holder.tv_nameOfDiploma.setText(diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + " " + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
+
+
+            holder.spinnerTrack.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+                    if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Web")) {
+                        track = Web[pos];
+                        CheckRequested(holder, holder.getAdapterPosition(), track);
+                    } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
+                        track = Mobile[pos];
+                        CheckRequested(holder, holder.getAdapterPosition(), track);
+                    } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {
+                        track = GraphicDesign[pos];
+                        CheckRequested(holder, holder.getAdapterPosition(), track);
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                    if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Web")) {
+                        track = Web[0];
+                    } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
+                        track = Mobile[0];
+                    } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {
+                        track = GraphicDesign[0];
+                    }
+                } //Done
+            }); //Done
+
+            holder.join.setOnClickListener(view -> {
+                if (mAuth != null) {
+                    if (track.equals("Choose") && !keyJoin.equals("Watch")) {
+                        Toast.makeText(holder.itemView.getContext(), "you have to choose track first", Toast.LENGTH_LONG).show();
+                    } else if (keyJoin.equals("Delete") || keyJoin.equals("join") || keyJoin.equals("Watch")) {
+                        askJoin(holder);
+                    }
+                }
+            }); //Done
+
+            holder.itemView.setOnClickListener(view -> {
+                if (mAuth != null) {
+                    try {
+                        AboutIntent.putExtra("nameOfDiploma", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
+                        AboutIntent.putExtra("nameOfDevelpoer", diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer());
+                        AboutIntent.putExtra("lastPrice", diplomas.get(holder.getAdapterPosition()).getLastPrice());
+                        AboutIntent.putExtra("newPrice", diplomas.get(holder.getAdapterPosition()).getNewPrice());
+                        AboutIntent.putExtra("imageOfDiploma", diplomas.get(holder.getAdapterPosition()).getImageOfDiploma());
+                        AboutIntent.putExtra("animationDiscount", diplomas.get(holder.getAdapterPosition()).getUrlAnimation());
+                        AboutIntent.putExtra("aboutCourses", diplomas.get(holder.getAdapterPosition()).getAboutCourse());
+                        AboutIntent.putExtra("numberOfDiploma", diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
+                        AboutIntent.putExtra("promo_youtube", diplomas.get(holder.getAdapterPosition()).getPromo_youtube());
+                        AboutIntent.putExtra("UserId", UserId);
+                        AboutIntent.putExtra("timestamp", diplomas.get(holder.getAdapterPosition()).getTimestamp());
+                        AboutIntent.putExtra("email", email_user);
+                        Log.e("DiplomasAdapter = ", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
+                        holder.itemView.getContext().startActivity(AboutIntent);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            CheckSubscription(holder, holder.getAdapterPosition());
+            check = CheckRequested(holder, holder.getAdapterPosition(), "");
+        }else {
+            holder.constraintlayout.setVisibility(View.GONE);
         }
-        try {
-            if (diplomas.get(holder.getAdapterPosition()).getImageOfDiploma() == null || diplomas.get(holder.getAdapterPosition()).getImageOfDiploma().equals("")) {
-                int[] computer = new int[]{R.raw.computer_science_x, R.raw.programming_computer1, R.raw.man_working_on_computer};
-                Random random = new Random();
-                int number = random.nextInt(3);
-                holder.animation.setAnimation(computer[number]);
-            } else {
-                Glide.with(holder.itemView.getContext()).load(diplomas.get(holder.getAdapterPosition()).getImageOfDiploma()).placeholder(R.drawable.loading_icon).into(holder.imageOfDiploma);
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-
-        holder.nameOfDevelpoer.setText(diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer());
-        holder.tv_nameOfDiploma.setText(diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + " " + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
-
-
-        holder.spinnerTrack.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
-                if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Web")) {
-                    track = Web[pos];
-                    CheckRequested(holder, holder.getAdapterPosition(), track);
-                } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
-                    track = Mobile[pos];
-                    CheckRequested(holder, holder.getAdapterPosition(), track);
-                } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {
-                    track = GraphicDesign[pos];
-                    CheckRequested(holder, holder.getAdapterPosition(), track);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Web")) {
-                    track = Web[0];
-                } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
-                    track = Mobile[0];
-                } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {
-                    track = GraphicDesign[0];
-                }
-            } //Done
-        }); //Done
-
-        holder.join.setOnClickListener(view -> {
-            if (mAuth != null) {
-                if (track.equals("Choose") && !keyJoin.equals("Watch")) {
-                    Toast.makeText(holder.itemView.getContext(), "you have to choose track first", Toast.LENGTH_LONG).show();
-                } else if (keyJoin.equals("Delete") || keyJoin.equals("join") || keyJoin.equals("Watch")) {
-                    askJoin(holder);
-                }
-            }
-        }); //Done
-
-        holder.itemView.setOnClickListener(view -> {
-            if (mAuth != null) {
-                try {
-                    AboutIntent.putExtra("nameOfDiploma", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
-                    AboutIntent.putExtra("nameOfDevelpoer", diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer());
-                    AboutIntent.putExtra("lastPrice", diplomas.get(holder.getAdapterPosition()).getLastPrice());
-                    AboutIntent.putExtra("newPrice", diplomas.get(holder.getAdapterPosition()).getNewPrice());
-                    AboutIntent.putExtra("imageOfDiploma", diplomas.get(holder.getAdapterPosition()).getImageOfDiploma());
-                    AboutIntent.putExtra("animationDiscount", diplomas.get(holder.getAdapterPosition()).getUrlAnimation());
-                    AboutIntent.putExtra("aboutCourses", diplomas.get(holder.getAdapterPosition()).getAboutCourse());
-                    AboutIntent.putExtra("numberOfDiploma", diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
-                    AboutIntent.putExtra("promo_youtube", diplomas.get(holder.getAdapterPosition()).getPromo_youtube());
-                    AboutIntent.putExtra("UserId", UserId);
-                    AboutIntent.putExtra("timestamp", diplomas.get(holder.getAdapterPosition()).getTimestamp());
-                    AboutIntent.putExtra("email", email_user);
-                    Log.e("DiplomasAdapter = ", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
-                    holder.itemView.getContext().startActivity(AboutIntent);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        CheckSubscription(holder, holder.getAdapterPosition());
-        check = CheckRequested(holder, holder.getAdapterPosition(), "");
-
     }
 
 
@@ -191,7 +199,6 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                 holder.join.setEnabled(true);
                 String PushId = UserId + ":" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma();
                 String DiplomaId = diplomas.get(holder.getAdapterPosition()).getNameOfDevelpoer() + ":" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma() + ":" + diplomas.get(holder.getAdapterPosition()).getTimestamp();
-
                 Map<String, Object> mapRequest = new HashMap<>();
                 mapRequest.put("nameOfDiploma", diplomas.get(holder.getAdapterPosition()).getNameOfDiploma());
                 mapRequest.put("numberOfDiploma", diplomas.get(holder.getAdapterPosition()).getNumberOfDiploma());
@@ -236,6 +243,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
         private Spinner spinnerTrack;
         private ConstraintLayout continer;
         private LottieAnimationView animation;
+        private ConstraintLayout constraintlayout;
 
         public DiplomasViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -247,6 +255,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
             spinnerTrack = itemView.findViewById(R.id.spinnerTrack);
             continer = itemView.findViewById(R.id.continer);
             watch = itemView.findViewById(R.id.watch);
+            constraintlayout = itemView.findViewById(R.id.constraintlayout);
 
         }
     }
@@ -309,7 +318,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         Emails mEmail = dataSnapshot.getValue(Emails.class);
                         assert mEmail != null; //make sure mEmail not equal null ,(assert == make sure)
-                        if (mEmail.getDiplomaId().equals(DiplomaId)) {
+                        if (mEmail.getDiplomaId().equals(DiplomaId) && mEmail.getUserId().equals(UserId)) {
                             holder.join.setText("Watch");
                             keyJoin = "Watch";
                             holder.watch.setVisibility(View.VISIBLE);

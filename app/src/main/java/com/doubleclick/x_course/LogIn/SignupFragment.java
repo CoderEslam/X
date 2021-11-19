@@ -41,7 +41,7 @@ public class SignupFragment extends Fragment {
 
     //    private TextView alreadyhaveanAcount;
     private FrameLayout parentFrameLayout;
-    private EditText signupEmail,signupPassword,signupFullName;
+    private EditText signupEmail, signupPassword, signupFullName;
     private Button signupbtn;
     private LottieAnimationView signupProgressBar;
     private ImageView Exitbtn;
@@ -71,7 +71,7 @@ public class SignupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_signup, container, false);
+        View view = inflater.inflate(R.layout.fragment_signup, container, false);
 
         firebaseAuthentication = FirebaseAuth.getInstance();
 //        UserFirebaseFirestore = FirebaseFirestore.getInstance();
@@ -81,14 +81,9 @@ public class SignupFragment extends Fragment {
         signupEmail = view.findViewById(R.id.et_Email);
         signupPassword = view.findViewById(R.id.et_Password);
         signupFullName = view.findViewById(R.id.et_Name);
-        signupbtn  =view.findViewById(R.id.btn_signup);
+        signupbtn = view.findViewById(R.id.btn_signup);
         signupProgressBar = view.findViewById(R.id.signupProgressBar);
-        Exitbtn= view.findViewById(R.id.Back);
-
-        Exitbtn.setOnClickListener(view1 -> {
-            setFragment(new SigninFragment());
-        });
-
+        Exitbtn = view.findViewById(R.id.Back);
         return view;
 
     }
@@ -96,17 +91,10 @@ public class SignupFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-//        alreadyhaveanAcount.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setFragment(new SigninFragment());
-//            }
-//        });
         Exitbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SendUserToMainActivity();
+                setFragment(new SigninFragment());
             }
         });
 
@@ -171,7 +159,7 @@ public class SignupFragment extends Fragment {
 
     private void CheckEmailAndPassword() {
         Drawable errorIcon = getResources().getDrawable(R.drawable.error_24);
-        errorIcon.setBounds(0,0,errorIcon.getIntrinsicWidth(),errorIcon.getIntrinsicHeight());
+        errorIcon.setBounds(0, 0, errorIcon.getIntrinsicWidth(), errorIcon.getIntrinsicHeight());
         if (!TextUtils.isEmpty(signupEmail.getText().toString())//.matches(EMAILPATTERN)
         ) {
             signupProgressBar.setVisibility(View.VISIBLE);
@@ -183,12 +171,12 @@ public class SignupFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                                 String UserId = mAuth.getCurrentUser().getUid().toString();
-                                Map<Object,String> UserData = new HashMap<>();
-                                UserData.put("username",signupFullName.getText().toString());
-                                UserData.put("imageURL","default");
-                                UserData.put("id",UserId);
-                                UserData.put("search",signupFullName.getText().toString());
-                                UserData.put("email",signupEmail.getText().toString());
+                                Map<Object, String> UserData = new HashMap<>();
+                                UserData.put("username", signupFullName.getText().toString());
+                                UserData.put("imageURL", "default");
+                                UserData.put("id", UserId);
+                                UserData.put("search", signupFullName.getText().toString());
+                                UserData.put("email", signupEmail.getText().toString());
                                 SendUserToMainActivity();
                                 String CurrentUserID = firebaseAuthentication.getCurrentUser().getUid();
                                 RootdatabaseReference.child("Users").child(CurrentUserID).setValue(UserData);
@@ -205,45 +193,45 @@ public class SignupFragment extends Fragment {
                         }
                     });
 
-        }
-        else {
+        } else {
 //            signupEmail.setError("Invaild Email!",errorIcon);
         }
     }
 
-    private void SendUserToMainActivity(){
+    private void SendUserToMainActivity() {
         Intent mainIntent = new Intent(getActivity(), NavigationDrawerActivity.class);
         startActivity(mainIntent);
         getActivity().finish();
     }
 
     private void checkInputs() {
-        if (!TextUtils.isEmpty(signupEmail.getText().toString())){
-            if (!TextUtils.isEmpty(signupPassword.getText()) &&signupPassword.length() >= 8){
-                if (!TextUtils.isEmpty(signupFullName.getText().toString())){
+        if (!TextUtils.isEmpty(signupEmail.getText().toString())) {
+            if (!TextUtils.isEmpty(signupPassword.getText()) && signupPassword.length() >= 8) {
+                if (!TextUtils.isEmpty(signupFullName.getText().toString())) {
                     // TODO : when every think is okay so >> enable .
                     signupbtn.setEnabled(true);
                     signupbtn.setTextColor(getResources().getColor(R.color.darkBlue));
-                }else {
+                } else {
                     signupbtn.setTextColor(getResources().getColor(R.color.whiteGray));
                     signupbtn.setEnabled(false);
                 }
-            }else {
+            } else {
                 signupbtn.setTextColor(getResources().getColor(R.color.whiteGray));
                 signupbtn.setEnabled(false);
             }
-        }else {
+        } else {
             signupbtn.setTextColor(getResources().getColor(R.color.whiteGray));
             signupbtn.setEnabled(false);
         }
     }
 
-    private void setFragment(Fragment signinFragment) {
+    private void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        //setCustomAnimations(    new    ,     current     )
-        fragmentTransaction.setCustomAnimations(R.anim.bounce,R.anim.mixed_anim);
+        // to change between fragment with animation
+        fragmentTransaction.setCustomAnimations(R.anim.slide_from_right, R.anim.slideout_from_right);
         //replace first fragment (frameLayout.getId()) with SigninFragment
-        fragmentTransaction.replace(parentFrameLayout.getId(),signinFragment);
+        fragmentTransaction.replace(R.id.register_frameLayout, fragment);
+        //commit == execute
         fragmentTransaction.commit();
     }
 

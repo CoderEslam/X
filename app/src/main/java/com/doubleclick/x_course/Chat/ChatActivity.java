@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -96,17 +97,28 @@ public class ChatActivity extends AppCompatActivity {
         });
         animationWhatApp.setOnClickListener(view -> {
             if (numberWhats != null) {
-                Uri whatAppUri = Uri.parse("smsto:" + "+2" + numberWhats);
-                Intent intentWhats = new Intent(Intent.ACTION_SENDTO, whatAppUri);
-                intentWhats.setPackage("com.whatsapp");
-                startActivity(intentWhats);
+                try {
+                    Uri whatAppUri = Uri.parse("smsto:" + "+2" + numberWhats);
+                    Intent intentWhats = new Intent(Intent.ACTION_SENDTO, whatAppUri);
+                    intentWhats.setPackage("com.whatsapp");
+                    startActivity(intentWhats);
+                }catch (ActivityNotFoundException e){
+                    Toast.makeText(ChatActivity.this,"You don't have whatsapp!",Toast.LENGTH_LONG).show();
+                }
+
             }
         });
         animationCalling.setOnClickListener(view -> {
             if (numberWhats != null) {
-                Uri callUri = Uri.parse("tel:" + "+2" + numberWhats);
-                Intent intentCall = new Intent(Intent.ACTION_DIAL, callUri);
-                startActivity(intentCall);
+                try {
+                    Uri callUri = Uri.parse("tel:" + "+2" + numberWhats);
+                    Intent intentCall = new Intent(Intent.ACTION_DIAL, callUri);
+                    startActivity(intentCall);
+                }catch (ActivityNotFoundException e){
+                    Toast.makeText(ChatActivity.this,"You don't have call app!",Toast.LENGTH_LONG).show();
+
+                }
+
             }
         });
         recyclerView = findViewById(R.id.ChatrecyclerView);

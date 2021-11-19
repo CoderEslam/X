@@ -39,7 +39,7 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 public class ForgetpasswordFragment extends Fragment {
 
-    private TextView tv_email, tv_goBack;
+    private TextView tv_email ,tv_goBack;
     private ImageView Iv_email;
     private ProgressBar emailprogressBar;
     private Button emailbtn;
@@ -67,7 +67,7 @@ public class ForgetpasswordFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_forgetpassword, container, false);
+        View view =  inflater.inflate(R.layout.fragment_forgetpassword, container, false);
         frameLayout = getActivity().findViewById(R.id.register_frameLayout);
         tv_email = view.findViewById(R.id.tv_email);
         Iv_email = view.findViewById(R.id.Iv_email);
@@ -76,7 +76,7 @@ public class ForgetpasswordFragment extends Fragment {
         emailprogressBar = view.findViewById(R.id.forgetprogressBar);
         emailbtn = view.findViewById(R.id.btn_forgetpassword);
         tv_goBack = view.findViewById(R.id.tv_goBack);
-        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth  = FirebaseAuth.getInstance();
         return view;
     }
 
@@ -111,81 +111,78 @@ public class ForgetpasswordFragment extends Fragment {
             public void onClick(View v) {
                 emailprogressBar.setVisibility(View.VISIBLE);
                 emailbtn.setEnabled(false);
-//                emailbtn.setTextColor(Color.argb(50,250,250,250));
+                emailbtn.setTextColor(Color.argb(50,250,250,250));
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     TransitionManager.beginDelayedTransition(viewGroupPassword);
                 }
-                if (!et_email_forgetpassword.getText().toString().isEmpty()) {
-
-                    firebaseAuth.sendPasswordResetEmail(et_email_forgetpassword.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
+                firebaseAuth.sendPasswordResetEmail(et_email_forgetpassword.getText().toString())
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
 //                            tv_email.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.sample_anim));
-                                        Iv_email.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.sample_anim));
-                                        //is equal under
-                                        ScaleAnimation scaleAnimation = new ScaleAnimation(1, 0, 1, 0);
-                                        scaleAnimation.setDuration(100);
-                                        scaleAnimation.setInterpolator(new AccelerateInterpolator());
-                                        scaleAnimation.setRepeatMode(Animation.REVERSE);
-                                        scaleAnimation.setRepeatCount(1);
-                                        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
-                                            @Override
-                                            public void onAnimationStart(Animation animation) {
+                                    Iv_email.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.sample_anim));
+                                    //is equal under
+                                    ScaleAnimation scaleAnimation = new ScaleAnimation(1,0,1,0);
+                                    scaleAnimation.setDuration(100);
+                                    scaleAnimation.setInterpolator(new AccelerateInterpolator());
+                                    scaleAnimation.setRepeatMode(Animation.REVERSE);
+                                    scaleAnimation.setRepeatCount(1);
+                                    scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
+                                        @Override
+                                        public void onAnimationStart(Animation animation) {
 
-                                            }
-
-                                            @Override
-                                            public void onAnimationEnd(Animation animation) {
-
-                                            }
-
-                                            @Override
-                                            public void onAnimationRepeat(Animation animation) {
-
-                                            }
-                                        });
-                                        tv_email.startAnimation(scaleAnimation);
-
-                                        tv_email.setVisibility(View.VISIBLE);
-                                        Iv_email.setVisibility(View.VISIBLE);
-                                        emailprogressBar.setVisibility(View.INVISIBLE);
-                                    } else {
-                                        emailprogressBar.setVisibility(View.INVISIBLE);
-                                        String error = task.getException().getMessage();
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                            TransitionManager.beginDelayedTransition(viewGroupPassword);
                                         }
-                                        Iv_email.setVisibility(View.INVISIBLE);
-                                        tv_email.setTextColor(Color.rgb(236, 30, 30));
-                                        tv_email.setVisibility(View.VISIBLE);
-                                        tv_email.setText(error);
-                                    }
-                                }
-                            });
-                }
-            }
 
+                                        @Override
+                                        public void onAnimationEnd(Animation animation) {
+
+                                        }
+
+                                        @Override
+                                        public void onAnimationRepeat(Animation animation) {
+
+                                        }
+                                    });
+                                    tv_email.startAnimation(scaleAnimation);
+
+                                    tv_email.setVisibility(View.VISIBLE);
+                                    Iv_email.setVisibility(View.VISIBLE);
+                                    emailprogressBar.setVisibility(View.INVISIBLE);
+                                }else {
+                                    emailprogressBar.setVisibility(View.INVISIBLE);
+                                    String error = task.getException().getMessage();
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                        TransitionManager.beginDelayedTransition(viewGroupPassword);
+                                    }
+                                    Iv_email.setVisibility(View.INVISIBLE);
+                                    tv_email.setTextColor(Color.rgb(236,30,30));
+                                    tv_email.setVisibility(View.VISIBLE);
+                                    tv_email.setText(error);
+                                }
+                            }
+                        });
+            }
         });
     }
 
     private void CheckInputs() {
-        if (TextUtils.isEmpty(et_email_forgetpassword.getText())) {
+        if (TextUtils.isEmpty(et_email_forgetpassword.getText())){
             emailbtn.setEnabled(false);
-            emailbtn.setTextColor(Color.argb(50, 112, 112, 112));
-        } else {
+            emailbtn.setTextColor(Color.argb(50,250,250,250));
+        }else {
             emailbtn.setEnabled(true);
-            emailbtn.setTextColor(Color.rgb(41, 41, 41));
+            emailbtn.setTextColor(Color.rgb(250,250,250));
         }
     }
 
-    private void setFragment(Fragment signinFragment) {
+    private void setFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
         // to change between fragment with animation
         fragmentTransaction.setCustomAnimations(R.anim.slide_from_right, R.anim.slideout_from_right);
         //replace first fragment (frameLayout.getId()) with SigninFragment
-        fragmentTransaction.replace(frameLayout.getId(), signinFragment);
+        fragmentTransaction.replace(R.id.register_frameLayout,fragment);
         //commit == execute
         fragmentTransaction.commit();
     }

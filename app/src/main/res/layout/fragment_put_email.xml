@@ -94,6 +94,7 @@
     </LinearLayout>
 
     <Button
+        android:enabled="false"
         android:layout_gravity="center"
         android:id="@+id/done"
         android:textAllCaps="false"

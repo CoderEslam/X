@@ -83,7 +83,7 @@ public class AboutCourseActivity extends AppCompatActivity {
                 @Override
                 public void onReady(YouTubePlayer youTubePlayer) {
                     if (promo_youtube == null) {
-                        youTubePlayer.loadVideo("poye96xY10w", 0);
+//                        youTubePlayer.loadVideo("poye96xY10w", 0);
                     } else {
                         youTubePlayer.loadVideo(promo_youtube, 0);
                     }
@@ -96,7 +96,7 @@ public class AboutCourseActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(ArrayList<YouTubeDataModel> youTubeDataModels) {
                         if (youTubeDataModels.size() != 0) {
-                            Log.e("AboutCourseActivity = ", youTubeDataModels.toString());
+//                            Log.e("AboutCourseActivity = ", youTubeDataModels.toString());
                             AllYouTubeArrayLists.add(youTubeDataModels);
                             Intent intent = new Intent(AboutCourseActivity.this, CourseActivity.class);
                             startActivity(intent);

@@ -1,6 +1,9 @@
 package com.doubleclick.x_course.CustomNavigation;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -35,6 +38,7 @@ import com.doubleclick.x_course.NavigationDrawerActivity;
 import com.doubleclick.x_course.R;
 import com.doubleclick.x_course.ViewModel.AdvertisementViewModel;
 import com.doubleclick.x_course.ViewModel.GraphicDesignViewModel;
+import com.doubleclick.x_course.ViewModel.ItemViewModel;
 import com.doubleclick.x_course.ViewModel.MainViewModel;
 import com.doubleclick.x_course.ViewModel.MobileViewModel;
 import com.doubleclick.x_course.ViewModel.WebViewModel;
@@ -42,11 +46,15 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.todkars.shimmer.ShimmerRecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainFragment extends Fragment {
@@ -74,11 +82,14 @@ public class MainFragment extends Fragment {
     private GraphicDesignViewModel graphicDesignViewModel;
     private ShimmerRecyclerView main_courses;
     LifecycleOwner lifecycleOwner;
-    private DatabaseReference referenceAllPlayLists;
     ViewModelStoreOwner viewModelStoreOwner;
-//    private Toolbar toolbar;
-
-
+    private ConnectivityManager connectivityManager;
+    private NetworkInfo networkInfo;
+    private ItemViewModel itemViewModel;
+//    private String names[] = {"Android", "Web", "GraphicDesgin"};
+//    private int icons[] = {R.drawable.android, R.drawable.web, R.drawable.graphic_};
+    ArrayList<ItemCourse> itemCourses = new ArrayList<>();
+    private ItemCourseAdapter itemCourseAdapter;
     public MainFragment() {
         // Required empty public constructor
     }
@@ -102,7 +113,8 @@ public class MainFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
         setHasOptionsMenu(true);
-
+        connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        networkInfo = connectivityManager.getActiveNetworkInfo();
         if (mAuth != null && firebaseUser != null) {
             mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
             advertisementViewModel = new ViewModelProvider(this).get(AdvertisementViewModel.class);
@@ -116,16 +128,62 @@ public class MainFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_main, container, false);
         MainRecyclerView = view.findViewById(R.id.MainRecyclerView);
 
-//        toolbar = view.findViewById(R.id.toolbar);
-//        AppCompatActivity activity = (AppCompatActivity) getActivity();
-//        activity.setSupportActionBar(toolbar);
 
         lifecycleOwner = getViewLifecycleOwner();
-//        viewModelStoreOwner = (ViewModelStoreOwner) getViewLifecycleOwner();
-        mobileViewModel = new ViewModelProvider(this).get(MobileViewModel.class);
-        webViewModel = new ViewModelProvider(this).get(WebViewModel.class);
-        graphicDesignViewModel = new ViewModelProvider(this).get(GraphicDesignViewModel.class);
-        referenceAllPlayLists = FirebaseDatabase.getInstance().getReference().child("AllPlayLists");
+        viewModelStoreOwner = (ViewModelStoreOwner) getViewLifecycleOwner();
+        itemViewModel = new ViewModelProvider(this).get(ItemViewModel.class);
+        itemViewModel.getItemCourse().observe(getViewLifecycleOwner(), new Observer<ArrayList<ItemCourse>>() {
+            @Override
+            public void onChanged(ArrayList<ItemCourse> itemCourses) {
+                itemCourseAdapter = new ItemCourseAdapter(itemCourses);
+                itemCourseAdapter.onClickItemListener(new ItemCourseAdapter.itemListener() {
+                    @Override
+                    public void mListener(int postion) {
+                        if (postion == 0 && networkInfo != null && networkInfo.isConnected()) {
+                            mobileViewModel = new ViewModelProvider(viewModelStoreOwner).get(MobileViewModel.class);
+                            mobileViewModel.getMobileData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
+                                @Override
+                                public void onChanged(ArrayList<Diploma> diplomas) {
+                                    if (diplomas.size() != 0) {
+                                        loadingAnimView.setVisibility(View.GONE);
+                                        LoadAllDiplomas(diplomas);
+                                    }
+                                }
+                            });
+                        } else if (postion == 1 && networkInfo != null && networkInfo.isConnected()) {
+                            webViewModel = new ViewModelProvider(viewModelStoreOwner).get(WebViewModel.class);
+                            webViewModel.getWebData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
+                                @Override
+                                public void onChanged(ArrayList<Diploma> diplomas) {
+                                    if (networkInfo != null && networkInfo.isConnected() && diplomas.size() != 0) {
+                                        LoadAllDiplomas(diplomas);
+                                        loadingAnimView.setVisibility(View.GONE);
+                                    } else {
+                                        webViewModel.getWebData().removeObservers(lifecycleOwner);
+                                        MainRecyclerView.setVisibility(View.GONE);
+
+                                    }
+
+                                }
+                            });
+                        } else if (postion == 2 && networkInfo != null && networkInfo.isConnected()) {
+                            graphicDesignViewModel = new ViewModelProvider(viewModelStoreOwner).get(GraphicDesignViewModel.class);
+                            graphicDesignViewModel.getGraphicDesign().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
+                                @Override
+                                public void onChanged(ArrayList<Diploma> diplomas) {
+                                    if (diplomas.size() != 0) {
+                                        loadingAnimView.setVisibility(View.GONE);
+                                        LoadAllDiplomas(diplomas);
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                });
+                main_courses.setAdapter(itemCourseAdapter);
+            }
+        });
         main_courses = view.findViewById(R.id.main_courses);
         recycler_Advertisement = view.findViewById(R.id.recycler_Advertisement);
         MainRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -133,45 +191,17 @@ public class MainFragment extends Fragment {
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         recycler_Advertisement.setLayoutManager(linearLayoutManager);
         loadingAnimView = view.findViewById(R.id.loadingAnimView);
-        if (mAuth != null && firebaseUser != null) {
+        if (mAuth != null && firebaseUser != null && networkInfo != null && networkInfo.isConnected()) {
             mainViewModel.getLiveData().observe(getViewLifecycleOwner(), new Observer<ArrayList<Diploma>>() {
                 @Override
                 public void onChanged(ArrayList<Diploma> diplomas) {
 //                    LoadAllDiplomas(diplomas);
                     if (!diplomas.isEmpty()) {
-                        Log.e("MainFragment  = ",""+diplomas.toString());
                         loadingAnimView.setVisibility(View.GONE);
                         LoadAllDiplomas(diplomas);
                     }
                 }
             });
-
-            mobileViewModel.getMobileData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
-                @Override
-                public void onChanged(ArrayList<Diploma> diplomas) {
-                    if (!diplomas.isEmpty()){
-//                        LoadAllDiplomas(diplomas);
-                    }
-                }
-            });
-
-//            webViewModel.getWebData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
-//                @Override
-//                public void onChanged(ArrayList<Diploma> diplomas) {
-//                    if (!diplomas.isEmpty()){
-//                        LoadAllDiplomas(diplomas);
-//                    }
-//                }
-//            });
-
-//            graphicDesignViewModel.getGraphicDesign().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
-//                @Override
-//                public void onChanged(ArrayList<Diploma> diplomas) {
-//                    if (!diplomas.isEmpty()){
-//                        LoadAllDiplomas(diplomas);
-//                    }
-//                }
-//            });
 
             advertisementViewModel.LoadAdv().observe(getViewLifecycleOwner(), new Observer<ArrayList<Advertisement>>() {
                 @Override
@@ -189,80 +219,22 @@ public class MainFragment extends Fragment {
         } else {
             loadingAnimView.setVisibility(View.GONE);
         }
-        ArrayList<ItemCourse> itemCourses = new ArrayList<>();
-        itemCourses.add(new ItemCourse(R.drawable.android,"Android",R.drawable.item_blue));
-        itemCourses.add(new ItemCourse(R.drawable.web,"Web",R.drawable.item_blue));
-        itemCourses.add(new ItemCourse(R.drawable.graphic_,"GraphicDesgin",R.drawable.item_blue));
-        ItemCourseAdapter itemCourseAdapter = new ItemCourseAdapter(itemCourses);
-        itemCourseAdapter.onClickItemListener(new ItemCourseAdapter.itemListener() {
-            @Override
-            public void mListener(int postion, ItemCourseAdapter.ItemCourseViewHolder holder) {
-                if (holder.getAdapterPosition()==0){
-//                    mobileViewModel = new ViewModelProvider(viewModelStoreOwner).get(MobileViewModel.class);
-                    mobileViewModel.getMobileData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
-                        @Override
-                        public void onChanged(ArrayList<Diploma> diplomas) {
-                            LoadAllDiplomas(diplomas);
-                        }
-                    });
-                }else if (holder.getAdapterPosition()==1){
-//                    webViewModel = new ViewModelProvider(viewModelStoreOwner).get(WebViewModel.class);
-                    webViewModel.getWebData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
-                        @Override
-                        public void onChanged(ArrayList<Diploma> diplomas) {
-                            LoadAllDiplomas(diplomas);
-                        }
-                    });
-                }else if (postion==2){
-//                    graphicDesignViewModel = new ViewModelProvider(viewModelStoreOwner).get(GraphicDesignViewModel.class);
-                    graphicDesignViewModel.getGraphicDesign().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
-                        @Override
-                        public void onChanged(ArrayList<Diploma> diplomas) {
-                            LoadAllDiplomas(diplomas);
 
-                        }
-                    });
-                }
-
-            }
-        });
-        main_courses.setAdapter(itemCourseAdapter);
-
-
-        FirebaseRecyclerOptions<Diploma> options = new FirebaseRecyclerOptions.Builder<Diploma>().setQuery(referenceAllPlayLists, Diploma.class).build();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Diploma, DiplomaAdapter>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull DiplomaAdapter diplomaAdapter, int i, @NonNull Diploma diploma) {
-
-                Toast.makeText(getContext(), "This is  = " + diploma.toString(), Toast.LENGTH_SHORT).show();
-
-            }
-
-            @NonNull
-            @Override
-            public DiplomaAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return null;
-            }
-        };
         return view;
     }
 
-    private class DiplomaAdapter extends RecyclerView.ViewHolder {
-        public DiplomaAdapter(@NonNull View itemView) {
-            super(itemView);
-
-
-        }
-    }
-
-
 
     private void LoadAllDiplomas(ArrayList<Diploma> diplomas) {
+        try {
 //        homePageArrayList.add(new HomePage(diplomas,mEmail,mUserId,mUserName,mImageURL,1));
-        diplomasAdapter = new DiplomasAdapter(diplomas, mEmail, mUserId, mUserName, mImageURL, getContext());
-        MainRecyclerView.setAdapter(diplomasAdapter); //homePageAdapter
+            diplomasAdapter = new DiplomasAdapter(diplomas, mEmail, mUserId, mUserName, mImageURL, getContext());
+            MainRecyclerView.setAdapter(diplomasAdapter); //homePageAdapter
 //        main_courses.setAdapter(diplomasAdapter);
-        diplomasAdapter.notifyDataSetChanged();//homePageAdapter
+            diplomasAdapter.notifyDataSetChanged();//homePageAdapter
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

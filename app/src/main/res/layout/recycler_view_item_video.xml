@@ -12,6 +12,8 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/Rec_All_Video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,6 +23,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_viewAll"
         tools:listitem="@layout/you_tube_post" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,18 +30,14 @@ public class VideosPostVarticalAdapter extends RecyclerView.Adapter<VideosPostVa
 
     public VideosPostVarticalAdapter(ArrayList<YouTubeDataModel> youTubeDataModels) {
         this.youTubeDataModels = youTubeDataModels;
-
     }
     private ArrayList<YouTubeDataModel> youTubeDataModels;
-
-
 
     @NonNull
     @Override
     public YouTubePostHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.you_tube_post, parent, false);
-        YouTubePostHolder youTubePostHolder = new YouTubePostHolder(view);
-        return youTubePostHolder;
+        return new YouTubePostHolder(view);
     }
 
     @Override
@@ -57,8 +54,6 @@ public class VideosPostVarticalAdapter extends RecyclerView.Adapter<VideosPostVa
         Picasso.with(holder.itemView.getContext()).load(youTubeDataModels.get(position).getThumnail()).placeholder(R.drawable.loading_icon).into(holder.ImageThumb);
 
     }
-
-
 
     @Override
     public int getItemCount() {

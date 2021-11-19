@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,6 +73,7 @@ public class HomePageAdapter extends RecyclerView.Adapter {
 
             case HomePage.ItemCourse://2
                 ArrayList<YouTubeDataModel> youTubeDataModels = homePageList.get(position).getYouTubeDataModelList();
+                Toast.makeText(holder.itemView.getContext(), "Done  = ", Toast.LENGTH_SHORT).show();
                 ((ItemVideoViewHolder) holder).setVideo(youTubeDataModels);
                 break;
 
@@ -117,7 +119,6 @@ public class HomePageAdapter extends RecyclerView.Adapter {
 
     public class ItemVideoViewHolder extends RecyclerView.ViewHolder {
         public RecyclerView Rec_All_Video;
-
         public ItemVideoViewHolder(@NonNull View itemView) {
             super(itemView);
             Rec_All_Video = itemView.findViewById(R.id.Rec_All_Video);
@@ -126,8 +127,8 @@ public class HomePageAdapter extends RecyclerView.Adapter {
         public void setVideo(ArrayList<YouTubeDataModel> allVideo) {
             VideosPostVarticalAdapter videosPostVarticalAdapter = new VideosPostVarticalAdapter(allVideo);
             Rec_All_Video.setAdapter(videosPostVarticalAdapter);
+            videosPostVarticalAdapter.notifyDataSetChanged();
         }
-
 
     }
 

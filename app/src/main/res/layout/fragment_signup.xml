@@ -9,11 +9,11 @@
 
 
     <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/animationView"
-        android:layout_width="300dp"
+        android:id="@+id/animationCalling"
+        android:layout_width="244dp"
         android:layout_height="200dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3"
@@ -21,11 +21,14 @@
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/user_profile" />
 
+
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-120dp"
+        android:layout_marginStart="-10dp"
+        android:layout_marginTop="-100dp"
+        android:layout_marginEnd="-10dp"
         android:cropToPadding="true"
         android:scaleType="center"
         android:scaleX="1"
@@ -65,7 +68,9 @@
         android:id="@+id/imageView12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="-120dp"
+        android:layout_marginStart="-10dp"
+        android:layout_marginEnd="-10dp"
+        android:layout_marginBottom="-100dp"
         android:cropToPadding="true"
         android:scaleType="center"
         android:scaleX="1"
@@ -94,7 +99,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/animationView" />
+        app:layout_constraintTop_toBottomOf="@+id/animationCalling" />
 
     <EditText
         android:id="@+id/et_Email"

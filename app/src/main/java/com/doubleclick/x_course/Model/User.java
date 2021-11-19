@@ -7,7 +7,11 @@ public class User {
     private String imageURL;
     private String status;
     private String email;
+    // new things
     private String Country;
+    private String Whatsapp;
+    private String bio;
+
 
 
     public String getCountry() {

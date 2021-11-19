@@ -79,7 +79,6 @@ public class HomePage {
     }
 
 
-
     public ArrayList<YouTubeDataModel> getYouTubeDataModelList() {
         return youTubeDataModelList;
     }
@@ -107,7 +106,7 @@ public class HomePage {
         this.advertisementArrayList = advertisementArrayList;
     }
 
-    public HomePage(int type,ArrayList<YouTubeDataModel> youTubeDataModelList) {
+    public HomePage(int type, ArrayList<YouTubeDataModel> youTubeDataModelList) {
         this.type = type;
         this.youTubeDataModelList = youTubeDataModelList;
     }
