@@ -74,28 +74,27 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Drawe
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
     private Toolbar toolbar;
-    private String UserId;
+    private String UserId = null;
     private ConnectivityManager connectivityManager;
     private NetworkInfo networkInfo;
     private LottieAnimationView animation_no_wifi;
     private MobileViewModel mobileViewModel;
     private WebViewModel webViewModel;
     private GraphicDesignViewModel graphicDesignViewModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation_drawer);
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         networkInfo = connectivityManager.getActiveNetworkInfo();
+        mAuth = FirebaseAuth.getInstance();
         animation_no_wifi = findViewById(R.id.animation_no_wifi);
-        if (networkInfo != null && networkInfo.isConnected()) {
+        if (UserId != null && mAuth != null && networkInfo != null && networkInfo.isConnected()) {
             userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
             animation_no_wifi.setVisibility(View.GONE);
             toolbar = findViewById(R.id.toolbar);
             toolbar.setTitle("Courses");
             setSupportActionBar(toolbar);
-            mAuth = FirebaseAuth.getInstance();
             userViewModel.getUserLiveData().observe(this, new Observer<User>() {
                 @Override
                 public void onChanged(User user) {

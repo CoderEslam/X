@@ -29,11 +29,14 @@ public class UserRespository {
     private User user;
 
     public UserRespository(UserListener userListener) {
-        this.userListener = userListener;
-        mAuth = FirebaseAuth.getInstance();
-        UserId = mAuth.getCurrentUser().getUid().toString();
-        reference = FirebaseDatabase.getInstance().getReference().child("Users").child(UserId);
+        try {
+            this.userListener = userListener;
+            mAuth = FirebaseAuth.getInstance();
+            UserId = mAuth.getCurrentUser().getUid().toString();
+            reference = FirebaseDatabase.getInstance().getReference().child("Users").child(UserId);
+        }catch (NullPointerException e){
 
+        }
     }
 
     public void LoadUserData(){
