@@ -11,7 +11,9 @@ import android.view.KeyEvent;
 import android.widget.FrameLayout;
 
 import com.doubleclick.x_course.LogIn.SigninFragment;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
