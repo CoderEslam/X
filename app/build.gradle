@@ -141,7 +141,5 @@ dependencies {
 
     implementation 'jp.wasabeef:blurry:4.0.0'
 
-    implementation 'com.devlomi.record-view:record-view:2.0.1'
-
-//    implementation 'com.github.3llomi:RecordView:3.0.2'
+//    implementation 'com.devlomi.record-view:record-view:2.0.1'
 }

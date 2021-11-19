@@ -1,4 +1,3 @@
-/*
 package com.doubleclick.recoredview;
 
 import android.animation.AnimatorSet;
@@ -250,4 +249,3 @@ public class AnimationHelper {
     }
 
 }
-*/

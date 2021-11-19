@@ -1,4 +1,3 @@
-/*
 package com.doubleclick.recoredview;
 
 
@@ -8,4 +7,3 @@ public interface OnRecordListener {
     void onFinish(long recordTime,boolean limitReached);
     void onLessThanSecond();
 }
-*/

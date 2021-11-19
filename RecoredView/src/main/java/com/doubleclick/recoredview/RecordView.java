@@ -1,4 +1,3 @@
-/*
 package com.doubleclick.recoredview;
 
 import android.content.Context;
@@ -34,7 +33,7 @@ public class RecordView extends RelativeLayout {
     private long startTime, elapsedTime = 0;
     private Context context;
     private OnRecordListener recordListener;
-    private RecordPermissionHandler recordPermissionHandler;
+    private RecordPermissionHandler recordPermissionHandler ;
     private boolean isSwiped, isLessThanSecondAllowed = false;
     private boolean isSoundEnabled = true;
     private int RECORD_START = R.raw.record_start;
@@ -404,7 +403,7 @@ public class RecordView extends RelativeLayout {
             canRecord = true;
         }
 
-        canRecord = recordPermissionHandler.isPermissionGranted();
+        canRecord = false;//recordPermissionHandler.isPermissionGranted();
 
         return canRecord;
     }
@@ -529,4 +528,3 @@ public class RecordView extends RelativeLayout {
 }
 
 
-*/

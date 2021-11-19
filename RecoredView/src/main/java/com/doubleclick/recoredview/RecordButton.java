@@ -1,5 +1,5 @@
-/*
 package com.doubleclick.recoredview;
+
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -95,28 +95,23 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        try {
-            if (isListenForRecord()) {
-                switch (event.getAction()) {
+        if (isListenForRecord()) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    recordView.onActionDown((RecordButton) v, event);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    recordView.onActionMove((RecordButton) v, event);
+                    break;
 
-                    case MotionEvent.ACTION_DOWN:
-                        recordView.onActionDown((RecordButton) v, event);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        recordView.onActionMove((RecordButton) v, event);
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        recordView.onActionUp((RecordButton) v);
-                        break;
-
-                }
+                case MotionEvent.ACTION_UP:
+                    recordView.onActionUp((RecordButton) v);
+                    break;
 
             }
-            return isListenForRecord();
-        } catch (NullPointerException e) {
-            return false;
+
         }
+        return isListenForRecord();
 
     }
 
@@ -148,4 +143,3 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
             onRecordClickListener.onClick(v);
     }
 }
-*/

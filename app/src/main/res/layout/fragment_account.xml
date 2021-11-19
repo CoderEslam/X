@@ -95,6 +95,7 @@
             android:textColor="@color/darkBlue" />
 
         <EditText
+            android:layout_width="match_parent"
             android:id="@+id/Bio"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -103,7 +104,6 @@
             android:textColor="@color/darkBlue"
             android:textColorHint="@color/gray" />
     </LinearLayout>
-
 
     <LinearLayout
         android:id="@+id/linearLayout4"

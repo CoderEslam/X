@@ -2,13 +2,6 @@ package com.doubleclick.x_course.Chat;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -21,13 +14,21 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
-import com.devlomi.record_view.OnBasketAnimationEnd;
-import com.devlomi.record_view.OnRecordClickListener;
-import com.devlomi.record_view.OnRecordListener;
-import com.devlomi.record_view.RecordButton;
-import com.devlomi.record_view.RecordView;
+import com.doubleclick.recoredview.OnBasketAnimationEnd;
+import com.doubleclick.recoredview.OnRecordClickListener;
+import com.doubleclick.recoredview.OnRecordListener;
+import com.doubleclick.recoredview.RecordButton;
+import com.doubleclick.recoredview.RecordView;
 import com.doubleclick.x_course.API.APIService;
 import com.doubleclick.x_course.Adapter.MessageAdapter;
 import com.doubleclick.x_course.Model.Chat;
@@ -79,8 +80,8 @@ public class ChatActivity extends AppCompatActivity {
     boolean notify = false;
     private AudioRecorder audioRecorder;
     private File recordFile;
-    RecordView recordView;
-    RecordButton btn_send;
+    private RecordView recordView;
+    private RecordButton btn_send;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class ChatActivity extends AppCompatActivity {
         animationCalling = findViewById(R.id.animationCalling);
         recyclerView = findViewById(R.id.ChatrecyclerView);
         recyclerView.setHasFixedSize(true);
+        audioRecorder = new AudioRecorder();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -101,6 +103,7 @@ public class ChatActivity extends AppCompatActivity {
         userid = intent.getStringExtra("userid");
         numberWhats = intent.getStringExtra("whtatsapp");
         recordView = findViewById(R.id.record_view);
+        //IMPORTANT
         btn_send.setRecordView(recordView);
         btn_send.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
@@ -125,7 +128,7 @@ public class ChatActivity extends AppCompatActivity {
         recordView.setOnRecordListener(new OnRecordListener() {
             @Override
             public void onStart() {
-                recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".mp3");//getFilesDir(), UUID.randomUUID().toString() + ".3gp");
+                recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".mp3");
                 try {
                     audioRecorder.start(recordFile.getPath());
                 } catch (IOException e) {
@@ -146,14 +149,15 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFinish(long recordTime) {
+            public void onFinish(long recordTime, boolean limitReached) {
                 stopRecording(false);
                 String time = getHumanTimeText(recordTime);
                 Toast.makeText(ChatActivity.this, "onFinishRecord - Recorded Time is: " + time + " File saved at " + recordFile.getPath(), Toast.LENGTH_SHORT).show();
                 Log.d("RecordView", "onFinish" + " Limit Reached? ");//+ limitReached);
                 Log.d("RecordTime", time);
-                functionTeilen(recordFile.getPath());
+//                functionTeilen(recordFile.getPath());
             }
+
 
             @Override
             public void onLessThanSecond() {
@@ -227,6 +231,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+
         seenMessage(userid);
         PermissionHandler();
 
@@ -247,14 +252,13 @@ public class ChatActivity extends AppCompatActivity {
         return false;
     }
 
-    public void functionTeilen(String file) { // this fun response to send
-        Uri uri = Uri.parse("android.resource://" + this.getPackageName() + "/raw/" + file);
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("audio/mpeg3");
-        share.putExtra(Intent.EXTRA_STREAM, uri);
-        startActivity(Intent.createChooser(share, "Audio teilen"));
-    }
-
+//    public void functionTeilen(String file) { // this fun response to send
+//        Uri uri = Uri.parse("android.resource://" + this.getPackageName() + "/raw/" + file);
+//        Intent share = new Intent(Intent.ACTION_SEND);
+//        share.setType("audio/mpeg3");
+//        share.putExtra(Intent.EXTRA_STREAM, uri);
+//        startActivity(Intent.createChooser(share, "Audio teilen"));
+//    }
 
     private void stopRecording(boolean deleteFile) {
         audioRecorder.stop();
@@ -388,7 +392,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-
 
     private void SendNotification(String friendid, String nameofsender, String message) {
 

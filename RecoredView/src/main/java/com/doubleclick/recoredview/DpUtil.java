@@ -1,4 +1,3 @@
-/*
 package com.doubleclick.recoredview;
 
 import android.content.Context;
@@ -21,4 +20,3 @@ public class DpUtil {
         return dp;
     }
 }
-*/

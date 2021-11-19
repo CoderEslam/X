@@ -7,8 +7,8 @@
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="15dp"
     android:paddingTop="15dp"
+    android:paddingBottom="15dp"
     android:visibility="visible">
 
 
@@ -20,7 +20,6 @@
         app:shimmer_animation_duration="1500"
         app:shimmer_color="#ffffff"
         app:shimmer_reverse_animation="true">
-
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -37,7 +36,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#444" />
-
 
         </LinearLayout>
     </com.doubleclick.shimmerlayout.ShimmerLayout>
@@ -58,7 +56,6 @@
         android:layout_alignParentLeft="true"
         android:layout_centerInParent="true"
         android:layout_marginLeft="8dp"
-
         android:visibility="invisible" />
 
     <Chronometer
@@ -74,6 +71,3 @@
 
 
 </RelativeLayout>
-
-
-

@@ -127,10 +127,10 @@
 <!--            android:rotation="-40"-->
 <!--            android:rotationX="53"-->
 <!--            android:rotationY="2" />-->
-        <com.devlomi.record_view.RecordButton
+        <com.doubleclick.recoredview.RecordButton
             android:id="@+id/btn_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:background="@drawable/recv_bg_mic"
@@ -138,24 +138,25 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:mic_icon="@drawable/recv_ic_mic_white" />
+            app:mic_icon="@drawable/ic_baseline_send_24" />
 
 
-        <com.devlomi.record_view.RecordView
+        <com.doubleclick.recoredview.RecordView
             android:id="@+id/record_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@id/btn_send"
             app:counter_time_color="#ff0000"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/text_send"
+            app:layout_constraintStart_toStartOf="@+id/text_send"
             app:layout_constraintTop_toTopOf="parent"
             app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
             app:slide_to_cancel_arrow_color="#000000"
             app:slide_to_cancel_bounds="10dp"
             app:slide_to_cancel_margin_right="10dp"
-            app:slide_to_cancel_text="Slide To Cancel"
-            tools:layout_editor_absoluteX="20dp" />
+            app:slide_to_cancel_text="Slide To Cancel" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -1,4 +1,3 @@
-/*
 package com.doubleclick.recoredview;
 
 import android.animation.AnimatorSet;
@@ -40,4 +39,4 @@ public class ScaleAnim {
         set.playTogether(scaleY, scaleX);
         set.start();
     }
-}*/
+}
