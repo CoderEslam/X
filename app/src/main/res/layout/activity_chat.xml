@@ -92,7 +92,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar2"
         tools:listitem="@layout/fack_chat" />
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -103,29 +103,62 @@
 
         <EditText
             android:id="@+id/text_send"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
             android:layout_toLeftOf="@id/btn_send"
             android:background="@android:color/transparent"
             android:hint="Type a message..."
             android:maxLines="10"
             android:textColor="@color/darkBlue"
-            android:textColorHint="@color/darkBlue" />
+            android:textColorHint="@color/darkBlue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_send"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageButton
+<!--        <ImageButton-->
+<!--            android:visibility="gone"-->
+<!--            android:layout_width="40dp"-->
+<!--            android:layout_height="40dp"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:background="@drawable/ic_baseline_send_24"-->
+<!--            android:rotation="-40"-->
+<!--            android:rotationX="53"-->
+<!--            android:rotationY="2" />-->
+        <com.devlomi.record_view.RecordButton
             android:id="@+id/btn_send"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:background="@drawable/ic_baseline_send_24"
-            android:rotation="-40"
-            android:rotationX="53"
-            android:rotationY="2" />
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/recv_bg_mic"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mic_icon="@drawable/recv_ic_mic_white" />
 
-    </RelativeLayout>
+
+        <com.devlomi.record_view.RecordView
+            android:id="@+id/record_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@id/btn_send"
+            app:counter_time_color="#ff0000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:slide_to_cancel_arrow="@drawable/recv_ic_arrow"
+            app:slide_to_cancel_arrow_color="#000000"
+            app:slide_to_cancel_bounds="10dp"
+            app:slide_to_cancel_margin_right="10dp"
+            app:slide_to_cancel_text="Slide To Cancel"
+            tools:layout_editor_absoluteX="20dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,25 @@ public class User {
     private String bio;
 
 
+    public String getWhatsapp() {
+        return Whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        Whatsapp = whatsapp;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+
+
+
 
     public String getCountry() {
         return Country;

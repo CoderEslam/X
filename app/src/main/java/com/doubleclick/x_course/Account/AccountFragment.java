@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -46,6 +49,7 @@ public class AccountFragment extends Fragment {
 
     CircleImageView image_profile;
     TextView username;
+    EditText Country,whatsapp,Bio;
 
     DatabaseReference reference;
     FirebaseUser fuser;
@@ -79,24 +83,46 @@ public class AccountFragment extends Fragment {
 
         image_profile = view.findViewById(R.id.profile_image_profile);
         username = view.findViewById(R.id.username);
-
+        Country  = view.findViewById(R.id.Country);
+        whatsapp  = view.findViewById(R.id.whatsapp);
+        Bio  = view.findViewById(R.id.Bio);
+        Button done  = view.findViewById(R.id.done);
         storageReference = FirebaseStorage.getInstance().getReference("uploads");
-
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String,Object> map = new HashMap<>();
+                map.put("Country",Country.getText().toString());
+                map.put("bio",Bio.getText().toString());
+                map.put("Whatsapp",whatsapp.getText().toString());
+                reference.updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(getContext(),"Uploaded",Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                username.setText(user.getUsername());
-                if (user.getImageURL().equals("default")){
-                    image_profile.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    try {
-                        Glide.with(getContext()).load(user.getImageURL()).into(image_profile);
-                    }catch (NullPointerException e){
+                if (dataSnapshot.exists()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    username.setText(user.getUsername());
+                    Country.setText(user.getCountry());
+                    whatsapp.setText(user.getWhatsapp());
+                    Bio.setText(user.getBio());
+                    if (user.getImageURL().equals("default")) {
+                        image_profile.setImageResource(R.mipmap.ic_launcher);
+                    } else {
+                        try {
+                            Glide.with(getContext()).load(user.getImageURL()).into(image_profile);
+                        } catch (NullPointerException e) {
 
+                        }
                     }
                 }
             }

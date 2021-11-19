@@ -82,6 +82,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, ChatActivity.class);
                 intent.putExtra("userid", user.getId());
+                try {
+                    if (!user.getWhatsapp().isEmpty()){
+                        intent.putExtra("whtatsapp",user.getWhatsapp());
+                    }
+                }catch (NullPointerException e){
+
+                }
                 mContext.startActivity(intent);
             }
         });

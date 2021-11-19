@@ -1,30 +1,37 @@
 package com.doubleclick.x_course.Chat;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
-
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
+import com.devlomi.record_view.OnBasketAnimationEnd;
+import com.devlomi.record_view.OnRecordClickListener;
+import com.devlomi.record_view.OnRecordListener;
+import com.devlomi.record_view.RecordButton;
+import com.devlomi.record_view.RecordView;
 import com.doubleclick.x_course.API.APIService;
 import com.doubleclick.x_course.Adapter.MessageAdapter;
 import com.doubleclick.x_course.Model.Chat;
 import com.doubleclick.x_course.Model.User;
-import com.doubleclick.x_course.Model.WhatsAppNumber;
 import com.doubleclick.x_course.Notifications.Client;
 import com.doubleclick.x_course.Notifications.Data;
 import com.doubleclick.x_course.Notifications.MyResponse;
@@ -39,13 +46,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -58,7 +66,6 @@ public class ChatActivity extends AppCompatActivity {
     private CircleImageView profile_image;
     private FirebaseUser fuser;
     private DatabaseReference reference;
-    private ImageButton btn_send;
     private EditText text_send;
     private MessageAdapter messageAdapter;
     private List<Chat> mchat;
@@ -68,76 +75,36 @@ public class ChatActivity extends AppCompatActivity {
     private String userid;
     private APIService apiService;
     private LottieAnimationView animationWhatApp, animationCalling;
-    private DatabaseReference referenceWhats;
     private String numberWhats = null;
-
-
     boolean notify = false;
+    private AudioRecorder audioRecorder;
+    private File recordFile;
+    RecordView recordView;
+    RecordButton btn_send;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         animationWhatApp = findViewById(R.id.animationWhatApp);
         animationCalling = findViewById(R.id.animationCalling);
-        referenceWhats = FirebaseDatabase.getInstance().getReference();
-        referenceWhats.child("WhatsApp").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                WhatsAppNumber whatsAppNumber = snapshot.getValue(WhatsAppNumber.class);
-                numberWhats = whatsAppNumber.getNumber();
-//                Toast.makeText(ChatActivity.this,""+whatsAppNumber.toString(),Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-        animationWhatApp.setOnClickListener(view -> {
-            if (numberWhats != null) {
-                try {
-                    Uri whatAppUri = Uri.parse("smsto:" + "+2" + numberWhats);
-                    Intent intentWhats = new Intent(Intent.ACTION_SENDTO, whatAppUri);
-                    intentWhats.setPackage("com.whatsapp");
-                    startActivity(intentWhats);
-                }catch (ActivityNotFoundException e){
-                    Toast.makeText(ChatActivity.this,"You don't have whatsapp!",Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        animationCalling.setOnClickListener(view -> {
-            if (numberWhats != null) {
-                try {
-                    Uri callUri = Uri.parse("tel:" + "+2" + numberWhats);
-                    Intent intentCall = new Intent(Intent.ACTION_DIAL, callUri);
-                    startActivity(intentCall);
-                }catch (ActivityNotFoundException e){
-                    Toast.makeText(ChatActivity.this,"You don't have call app!",Toast.LENGTH_LONG).show();
-
-                }
-
-            }
-        });
         recyclerView = findViewById(R.id.ChatrecyclerView);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
-
         profile_image = findViewById(R.id.profile_image_Chat);
         btn_send = findViewById(R.id.btn_send);
         text_send = findViewById(R.id.text_send);
-
         intent = getIntent();
         userid = intent.getStringExtra("userid");
-        fuser = FirebaseAuth.getInstance().getCurrentUser();
-
-        btn_send.setOnClickListener(new View.OnClickListener() {
+        numberWhats = intent.getStringExtra("whtatsapp");
+        recordView = findViewById(R.id.record_view);
+        btn_send.setRecordView(recordView);
+        btn_send.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 notify = true;
                 String msg = text_send.getText().toString();
                 if (!msg.equals("")) {
@@ -146,6 +113,94 @@ public class ChatActivity extends AppCompatActivity {
                     Toast.makeText(ChatActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
                 }
                 text_send.setText("");
+            }
+        });
+        //Cancel Bounds is when the Slide To Cancel text gets before the timer . default is 8
+        recordView.setCancelBounds(8);
+        recordView.setSmallMicColor(Color.parseColor("#c2185b"));
+        //prevent recording under one Second
+        recordView.setLessThanSecondAllowed(false);
+        recordView.setSlideToCancelText("Slide To Cancel");
+        recordView.setCustomSounds(R.raw.record_start,R.raw.record_finished, 0);
+        recordView.setOnRecordListener(new OnRecordListener() {
+            @Override
+            public void onStart() {
+                recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".mp3");//getFilesDir(), UUID.randomUUID().toString() + ".3gp");
+                try {
+                    audioRecorder.start(recordFile.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("RecordView", "onStart");
+
+                Toast.makeText(ChatActivity.this, "OnStartRecord", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                stopRecording(true);
+
+                Toast.makeText(ChatActivity.this, "onCancel", Toast.LENGTH_SHORT).show();
+
+                Log.d("RecordView", "onCancel");
+            }
+
+            @Override
+            public void onFinish(long recordTime) {
+                stopRecording(false);
+                String time = getHumanTimeText(recordTime);
+                Toast.makeText(ChatActivity.this, "onFinishRecord - Recorded Time is: " + time + " File saved at " + recordFile.getPath(), Toast.LENGTH_SHORT).show();
+                Log.d("RecordView", "onFinish" + " Limit Reached? ");//+ limitReached);
+                Log.d("RecordTime", time);
+                functionTeilen(recordFile.getPath());
+            }
+
+            @Override
+            public void onLessThanSecond() {
+                stopRecording(true);
+
+                Toast.makeText(ChatActivity.this, "OnLessThanSecond", Toast.LENGTH_SHORT).show();
+                Log.d("RecordView", "onLessThanSecond");
+            }
+        });
+
+        recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
+            @Override
+            public void onAnimationEnd() {
+                Log.d("RecordView", "Basket Animation Finished");
+            }
+        });
+
+
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
+        animationWhatApp.setOnClickListener(view -> {
+            if (numberWhats != null) {
+                try {
+                    Uri whatAppUri = Uri.parse("smsto:" + numberWhats);
+                    Intent intentWhats = new Intent(Intent.ACTION_SENDTO, whatAppUri);
+                    intentWhats.setPackage("com.whatsapp");
+                    startActivity(intentWhats);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(ChatActivity.this, "You don't have whatsapp!", Toast.LENGTH_LONG).show();
+                }
+
+            } else {
+                Toast.makeText(getApplicationContext(), "your friend doen't has a whats app", Toast.LENGTH_SHORT).show();
+            }
+        });
+        animationCalling.setOnClickListener(view -> {
+            if (numberWhats != null) {
+                try {
+                    Uri callUri = Uri.parse("tel:" + numberWhats);
+                    Intent intentCall = new Intent(Intent.ACTION_DIAL, callUri);
+                    startActivity(intentCall);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(ChatActivity.this, "You don't have call app!", Toast.LENGTH_LONG).show();
+
+                }
+
+            } else {
+                Toast.makeText(getApplicationContext(), "your friend doen't has a  Number", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -173,7 +228,39 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         seenMessage(userid);
+        PermissionHandler();
 
+    }
+
+    private boolean PermissionHandler() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+
+        boolean recordPermissionAvailable = ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED;
+        if (recordPermissionAvailable) {
+            return true;
+        }
+
+        ActivityCompat.requestPermissions(ChatActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, 0);
+
+        return false;
+    }
+
+    public void functionTeilen(String file) { // this fun response to send
+        Uri uri = Uri.parse("android.resource://" + this.getPackageName() + "/raw/" + file);
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("audio/mpeg3");
+        share.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(share, "Audio teilen"));
+    }
+
+
+    private void stopRecording(boolean deleteFile) {
+        audioRecorder.stop();
+        if (recordFile != null && deleteFile) {
+            recordFile.delete();
+        }
     }
 
     private void seenMessage(final String userid) {
@@ -255,6 +342,10 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    private String getHumanTimeText(long milliseconds) {
+        return String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(milliseconds), TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
+    }
+
     private void sendNotifiaction(String receiver, final String username, final String message) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver);
@@ -297,7 +388,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
     private void SendNotification(String friendid, String nameofsender, String message) {

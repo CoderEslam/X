@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_basket_animated.xml" value="0.2723076923076923" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_bg_mic.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_ic_arrow.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_ic_delete.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_ic_mic.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_ic_mic_white.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/layout/record_view_layout.xml" value="0.2604166666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable-v24/background_right.xml" value="0.19375" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable-v24/button_gray.xml" value="0.19375" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable-v24/buttons_white.xml" value="0.19375" />
@@ -46,7 +53,7 @@
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/cart_video_item.xml" value="0.2" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/fack_chat.xml" value="0.22" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/floating_layout.xml" value="0.22" />
-        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/fragment_account.xml" value="0.17708333333333334" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/fragment_account.xml" value="0.22" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/fragment_chat.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/fragment_create_diploma.xml" value="0.22" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/fragment_forgetpassword.xml" value="0.2" />
