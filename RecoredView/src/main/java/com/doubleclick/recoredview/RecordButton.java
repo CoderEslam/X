@@ -37,8 +37,6 @@ public class RecordButton extends AppCompatImageView implements View.OnTouchList
     public RecordButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context, attrs);
-
-
     }
 
     private void init(Context context, AttributeSet attrs) {
