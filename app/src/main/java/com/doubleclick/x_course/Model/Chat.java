@@ -6,6 +6,9 @@ public class Chat {
     private String receiver;
     private String message;
     private boolean isseen;
+    private String type;
+    private String imageId;
+
 
     public Chat(String sender, String receiver, String message, boolean isseen) {
         this.sender = sender;
@@ -47,5 +50,21 @@ public class Chat {
 
     public void setIsseen(boolean isseen) {
         this.isseen = isseen;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
 }

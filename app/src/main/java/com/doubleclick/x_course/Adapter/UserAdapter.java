@@ -32,7 +32,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private List<User> mUsers;
     private boolean ischat;
 
-    String theLastMessage;
+    String theLastMessage,type;
 
     public UserAdapter(Context mContext, List<User> mUsers, boolean ischat){
         this.mUsers = mUsers;
@@ -133,6 +133,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                         if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid) ||
                                 chat.getReceiver().equals(userid) && chat.getSender().equals(firebaseUser.getUid())) {
                             theLastMessage = chat.getMessage();
+                            type = chat.getType();
+
                         }
                     }
                 }
@@ -141,9 +143,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                     case  "default":
                         last_msg.setText("No Message");
                         break;
-
                     default:
-                        last_msg.setText(theLastMessage);
+                        if (type.equals("text")){
+                            last_msg.setText(theLastMessage);
+                        }else if (type.equals("image")){
+                            last_msg.setText("image");
+                        }
                         break;
                 }
 

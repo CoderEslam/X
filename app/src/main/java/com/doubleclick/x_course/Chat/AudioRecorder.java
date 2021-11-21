@@ -5,9 +5,7 @@ import android.media.MediaRecorder;
 import java.io.IOException;
 
 public class AudioRecorder {
-
     private MediaRecorder mediaRecorder;
-
 
     private void initMediaRecorder() {
         mediaRecorder = new MediaRecorder();

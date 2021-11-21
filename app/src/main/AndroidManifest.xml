@@ -24,6 +24,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.X_Course">
         <activity
+            android:name=".Chat.RecordActivity"
+            android:exported="false" />
+        <activity
             android:name=".Advertisement.AdvertisementActivity"
             android:exported="true" />
         <activity

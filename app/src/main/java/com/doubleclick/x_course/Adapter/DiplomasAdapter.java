@@ -1,23 +1,16 @@
 package com.doubleclick.x_course.Adapter;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -100,7 +93,6 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                 ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Web);
                 holder.spinnerTrack.setAdapter(aa);
             } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("Mobile")) {
-                Toast.makeText(holder.itemView.getContext(), "" + diplomas.get(holder.getAdapterPosition()).getNameOfDiploma(), Toast.LENGTH_SHORT).show();
                 ArrayAdapter aa = new ArrayAdapter(holder.itemView.getContext(), R.layout.item_spinner, R.id.tv_selected, Mobile);
                 holder.spinnerTrack.setAdapter(aa);
             } else if (diplomas.get(holder.getAdapterPosition()).getNameOfDiploma().equals("graphicDesign")) {

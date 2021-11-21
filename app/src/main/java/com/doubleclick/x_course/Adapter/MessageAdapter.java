@@ -23,8 +23,8 @@ import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
 
-    public static  final int MSG_TYPE_LEFT = 0;
-    public static  final int MSG_TYPE_RIGHT = 1;
+    public static final int MSG_TYPE_LEFT = 0;
+    public static final int MSG_TYPE_RIGHT = 1;
 
     private Context mContext;
     private List<Chat> mChat;
@@ -32,7 +32,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     FirebaseUser fuser;
 
-    public MessageAdapter(Context mContext, List<Chat> mChat, String imageurl){
+    public MessageAdapter(Context mContext, List<Chat> mChat, String imageurl) {
         this.mChat = mChat;
         this.mContext = mContext;
         this.imageurl = imageurl;
@@ -54,17 +54,32 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         Chat chat = mChat.get(position);
+        try {
+            if (chat.getType().isEmpty() || chat.getType() == null) {
+                holder.show_message.setText(chat.getMessage());
+                holder.imageSent.setVisibility(View.GONE);
+            } else {
+                if (chat.getType().equals("text")){
+                    holder.imageSent.setVisibility(View.GONE);
+                    holder.show_message.setText(chat.getMessage());
+                } else if (chat.getType().equals("image")){
+                    holder.show_message.setVisibility(View.GONE);
+                    holder.imageSent.setVisibility(View.VISIBLE);
+                    Glide.with(mContext).load(chat.getMessage()).placeholder(R.drawable.account_circle_24).into(holder.imageSent);
+                }
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
-        holder.show_message.setText(chat.getMessage());
-
-        if (imageurl.equals("default")){
+        if (imageurl.equals("default")) {
             holder.profile_image.setImageResource(R.drawable.account_circle_24);
         } else {
             Glide.with(mContext).load(imageurl).placeholder(R.drawable.account_circle_24).into(holder.profile_image);
         }
 
-        if (position == mChat.size()-1){
-            if (chat.isIsseen()){
+        if (position == mChat.size() - 1) {
+            if (chat.isIsseen()) {
                 holder.txt_seen.setText("Seen");
             } else {
                 holder.txt_seen.setText("Delivered");
@@ -80,21 +95,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return mChat.size();
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView show_message;
         public ImageView profile_image;
         public TextView txt_seen;
+        public ImageView imageSent;
 
         public ViewHolder(View itemView) {
             super(itemView);
             show_message = itemView.findViewById(R.id.show_message);
             profile_image = itemView.findViewById(R.id.profile_image);
             txt_seen = itemView.findViewById(R.id.txt_seen);
+            imageSent = itemView.findViewById(R.id.imageSent);
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    ClipboardManager clipboardManager =  (ClipboardManager) itemView.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipboardManager clipboardManager = (ClipboardManager) itemView.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboardManager.setText(mChat.get(getAdapterPosition()).getMessage());
                     Toast.makeText(itemView.getContext(), "Copied", Toast.LENGTH_SHORT).show();
                     return true;
@@ -107,7 +124,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public int getItemViewType(int position) {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if (mChat.get(position).getSender().equals(fuser.getUid())){
+        if (mChat.get(position).getSender().equals(fuser.getUid())) {
             return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;
