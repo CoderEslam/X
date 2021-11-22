@@ -6,12 +6,15 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -19,6 +22,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,6 +49,7 @@ import com.doubleclick.x_course.Notifications.Data;
 import com.doubleclick.x_course.Notifications.MyResponse;
 import com.doubleclick.x_course.Notifications.Sender;
 import com.doubleclick.x_course.Notifications.Token;
+import com.doubleclick.x_course.Premissions.Permissions;
 import com.doubleclick.x_course.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -68,8 +73,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -88,31 +92,36 @@ public class ChatActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private Intent intent;
     private ValueEventListener seenListener;
-    private String userid;
+    private String userid, audioPath;
     private APIService apiService;
     private LottieAnimationView animationWhatApp, animationCalling;
     private String numberWhats = null;
     boolean notify = false;
-    private AudioRecorder audioRecorder;
-    private File recordFile;
+    //    private AudioRecorder audioRecorder;
+//    private File recordFile;
     private ImageView btnDataSend;
     private final int REQUEST_Code = 20;
     StorageReference storageReference;
     private Uri imageUri;
     private StorageTask uploadTask;
     private ConstraintLayout layout_text;
+    private MediaRecorder mediaRecorder;
+    private TextView nameFriend;
+    private Permissions permissions;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        audioRecorder = new AudioRecorder();
+//        audioRecorder = new AudioRecorder();
         intent = getIntent();
         profile_image = findViewById(R.id.profile_image_Chat);
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         animationWhatApp = findViewById(R.id.animationWhatApp);
         animationCalling = findViewById(R.id.animationCalling);
         recyclerView = findViewById(R.id.ChatrecyclerView);
+        nameFriend = findViewById(R.id.nameFriend);
         recyclerView.setHasFixedSize(true);
         btnDataSend = findViewById(R.id.btnDataSend);
         et_text_send = findViewById(R.id.text_send);
@@ -126,12 +135,25 @@ public class ChatActivity extends AppCompatActivity {
         userid = intent.getStringExtra("userid");
         numberWhats = intent.getStringExtra("whtatsapp");
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+        reference.keepSynced(true);
         sendRecord.setListenForRecord(true);
+        nameFriend.setText(getIntent().getStringExtra("nameFriend").toString());
+        permissions = new Permissions();
+        permissions.isStorageOk(ChatActivity.this);
+        permissions.isRecordingOk(ChatActivity.this);
+        permissions.requestStorage(ChatActivity.this);
+        permissions.requestRecording(ChatActivity.this);
+        if (getIntent().getStringExtra("iamgeFriend").equals("default")) {
+            profile_image.setImageResource(R.mipmap.ic_launcher);
+        } else {
+            //and this
+            Glide.with(getApplicationContext()).load(getIntent().getStringExtra("iamgeFriend")).into(profile_image);
+        }
         //ListenForRecord must be false ,otherwise onClick will not be called
         sendRecord.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ChatActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ChatActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
                 Log.d("RecordButton", "RECORD BUTTON CLICKED");
             }
         });
@@ -139,7 +161,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 sendRecord.setListenForRecord(true);
-                Toast.makeText(ChatActivity.this, "Record not ", Toast.LENGTH_SHORT).show();
                 layout_text.setVisibility(View.VISIBLE);
             }
 
@@ -150,7 +171,6 @@ public class ChatActivity extends AppCompatActivity {
                     sendText.setVisibility(View.GONE);
                     recordView.setVisibility(View.VISIBLE);
                     sendRecord.setListenForRecord(true);
-                    Toast.makeText(ChatActivity.this, "Record not ", Toast.LENGTH_SHORT).show();
                     layout_text.setVisibility(View.GONE);
                 } else {
                     layout_text.setVisibility(View.VISIBLE);
@@ -161,7 +181,6 @@ public class ChatActivity extends AppCompatActivity {
                     recordView.setVisibility(View.GONE);
                     if (sendRecord.isListenForRecord()) {
                         sendRecord.setListenForRecord(false);
-                        Toast.makeText(ChatActivity.this, "Record ok", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -169,7 +188,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 sendRecord.setListenForRecord(true);
-                Toast.makeText(ChatActivity.this, "Record not ", Toast.LENGTH_SHORT).show();
                 layout_text.setVisibility(View.VISIBLE);
             }
         });
@@ -186,38 +204,66 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onStart() {
                 recordView.setVisibility(View.VISIBLE);
+                layout_text.setVisibility(View.INVISIBLE);
+                setUpRecording();
                 try {
-                    recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".3gp");
-                    audioRecorder.start(recordFile.getPath());
+                    mediaRecorder.prepare();
+                    mediaRecorder.start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                sendText.setVisibility(View.GONE);
+//                try {
+//                    recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".3gp");
+//                    audioRecorder.start(recordFile.getPath());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 Log.d("RecordView", "onStart");
                 Toast.makeText(ChatActivity.this, "OnStartRecord", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancel() {
-                stopRecording(true);
-                Toast.makeText(ChatActivity.this, "onCancel", Toast.LENGTH_SHORT).show();
-                Log.d("RecordView", "onCancel");
+                mediaRecorder.reset();
+                mediaRecorder.release();
+                File file = new File(audioPath);
+                if (file.exists()) {
+                    file.delete();
+                }
+                layout_text.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFinish(long recordTime) {
-                stopRecording(false);
-                String time = getHumanTimeText(recordTime);
-                Toast.makeText(ChatActivity.this, "onFinishRecord - Recorded Time is: " + time + " File saved at " + recordFile.getPath(), Toast.LENGTH_SHORT).show();
-                Log.d("RecordView", "onFinish" + " Limit Reached? ");
-                Log.d("RecordTime", time);
-                sendFile(fuser.getUid(), userid, recordFile.getPath());
+                layout_text.setVisibility(View.VISIBLE);
+                try {
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                sendText.setVisibility(View.VISIBLE);
+                sendRecodingMessage(audioPath);
+//                String time = getHumanTimeText(recordTime);
+//                Toast.makeText(ChatActivity.this, "onFinishRecord - Recorded Time is: " + time + " File saved at " + recordFile.getPath(), Toast.LENGTH_SHORT).show();
+//                Log.d("RecordView", "onFinish" + " Limit Reached? ");
+//                Log.d("RecordTime", time);
+//                sendFile(fuser.getUid(), userid, recordFile.getPath());
             }
 
             @Override
             public void onLessThanSecond() {
-                stopRecording(true);
-                Toast.makeText(ChatActivity.this, "OnLessThanSecond", Toast.LENGTH_SHORT).show();
-                Log.d("RecordView", "onLessThanSecond");
+                mediaRecorder.reset();
+                mediaRecorder.release();
+                File file = new File(audioPath);
+                if (file.exists()) {
+                    file.delete();
+                }
+                layout_text.setVisibility(View.VISIBLE);
+                sendText.setVisibility(View.VISIBLE);
+//                Toast.makeText(ChatActivity.this, "OnLessThanSecond", Toast.LENGTH_SHORT).show();
+//                Log.d("RecordView", "onLessThanSecond");
             }
         });
         recordView.setOnBasketAnimationEndListener(new OnBasketAnimationEnd() {
@@ -295,16 +341,9 @@ public class ChatActivity extends AppCompatActivity {
         btnDataSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                openFiles();
-                Intent intent = new Intent(ChatActivity.this, RecordActivity.class);
-                startActivity(intent);
+                openFiles();
             }
         });
-    }
-
-    private void sendVoice(String path) {
-
-
     }
 
     private void openFiles() {
@@ -327,12 +366,6 @@ public class ChatActivity extends AppCompatActivity {
         return false;
     }
 
-    private void stopRecording(boolean deleteFile) {
-        audioRecorder.stop();
-        if (recordFile != null && deleteFile) {
-            recordFile.delete();
-        }
-    }
 
     private void seenMessage(final String userid) {
         reference = FirebaseDatabase.getInstance().getReference("Chats");
@@ -412,10 +445,6 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    private String getHumanTimeText(long milliseconds) {
-        return String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(milliseconds), TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds)));
-    }
-
     private void sendNotifiaction(String receiver, final String username, final String message) {
         DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
         Query query = tokens.orderByKey().equalTo(receiver);
@@ -463,6 +492,7 @@ public class ChatActivity extends AppCompatActivity {
         mchat = new ArrayList<>();
 
         reference = FirebaseDatabase.getInstance().getReference("Chats");
+        reference.keepSynced(true);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -539,7 +569,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_Code && resultCode == RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
-            sendFile(fuser.getUid(), userid, "no");
+            sendImage(fuser.getUid(), userid);
         }
     }
 
@@ -549,18 +579,13 @@ public class ChatActivity extends AppCompatActivity {
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-    private void sendFile(String sender, String FriendId, String voice) {
+    private void sendImage(String sender, String FriendId) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading");
         progressDialog.show();
-        if (imageUri != null || recordFile != null) {
+        if (imageUri != null) {
             final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
-            if (voice.equals("no")) {
-                uploadTask = fileReference.putFile(imageUri);
-            } else {
-                Uri audioFile = Uri.fromFile(new File(voice));
-                uploadTask = fileReference.putFile(audioFile);
-            }
+            uploadTask = fileReference.putFile(imageUri);
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -581,19 +606,13 @@ public class ChatActivity extends AppCompatActivity {
                         hashMap.put("sender", sender);
                         hashMap.put("receiver", FriendId);
                         hashMap.put("message", mUri);
-                        if (voice.equals("no")) {
-                            hashMap.put("type", "image");
-                        } else {
-                            hashMap.put("type", "voice");
-                        }
+                        hashMap.put("type", "image");
                         hashMap.put("isseen", false);
                         hashMap.put("imageId", pushId);
                         reference.child("Chats").child(pushId).setValue(hashMap);
-                        if (voice.equals("no")) {
-                            sendNotifiaction(FriendId, fuser.getUid(), "Image");
-                        } else {
-                            sendNotifiaction(FriendId, fuser.getUid(), "voice");
-                        }
+                        sendNotifiaction(FriendId, "you have", "Image");
+
+
                         progressDialog.dismiss();
                     } else {
                         Toast.makeText(ChatActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
@@ -611,4 +630,65 @@ public class ChatActivity extends AppCompatActivity {
             Toast.makeText(ChatActivity.this, "No image selected", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void setUpRecording() {
+
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        File file = new File(Environment.getExternalStorageDirectory(), "Xteam");       // String f = "/storage/emulated/0/Download";
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        audioPath = getFilePath();//file.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".3gp";
+        mediaRecorder.setOutputFile(audioPath);
+    }
+
+    public void userInfo() {
+//        Intent intent = new Intent(this, UserInfo.class);
+//        intent.putExtra("userID", userid);
+//        startActivity(intent);
+    }
+
+    private void sendRecodingMessage(String audioPath) {
+        if (audioPath != null) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference("/Media/Recording/" + fuser.getUid() + ":" + userid + System.currentTimeMillis());
+            Log.e("audio path", audioPath);
+            Uri audioFile = Uri.fromFile(new File(audioPath));
+            Log.e("audioFile = ", audioFile.toString());
+            storageReference.putFile(audioFile).addOnSuccessListener(success -> {
+                Task<Uri> audioUrl = success.getStorage().getDownloadUrl();
+                audioUrl.addOnCompleteListener(path -> {
+                    if (path.isSuccessful()) {
+                        String url = path.getResult().toString();
+                        if (userid == null) {
+                            Toast.makeText(ChatActivity.this, "No thing to send", Toast.LENGTH_SHORT).show();
+                        } else {
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Chats");
+                            Map<String, Object> map = new HashMap<>();
+                            String pushId = databaseReference.push().getKey().toString();
+                            map.put("sender", fuser.getUid());
+                            map.put("receiver", userid);
+                            map.put("message", url);
+                            map.put("type", "voice");
+                            map.put("isseen", false);
+                            map.put("imageId", pushId);
+                            sendNotifiaction(userid, "you have", "voice");
+                            databaseReference.child(pushId).setValue(map);
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    private String getFilePath() {
+        ContextWrapper contextWrapper = new ContextWrapper(this);
+        File file = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
+        File f = new File(file, "Xteam.mp3");
+        return f.getPath();
+    }
+
 }

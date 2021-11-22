@@ -21,6 +21,7 @@ public class GraphicDesignReopsitory {
 
     public void getGraphicDesignDate() {
         referenceGraphicDesign = FirebaseDatabase.getInstance().getReference().child("GraphicDesign");
+        referenceGraphicDesign.keepSynced(true);
         referenceGraphicDesign.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {

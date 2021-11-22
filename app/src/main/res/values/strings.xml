@@ -37,4 +37,10 @@ Simply because we put ourselves in your place with the testimony of those who we
     <string name="watch">Watch</string>
     <string name="join">Join</string>
     <string name="Adv">Adveritsement</string>
+
+    <string name="slide_to_cancel">"Slide to cancel"</string>
+    <string name="app_info">"A WhatsApp style audio recording view to send voice notes in chat.\nHold the Mic to record, then slide left to cancel or swipe up to Lock and record.\n\nCredit:\nVarun John\nhttps://github.com/varunjohn\nvarunjohn1990@gmail.com"</string>
+    <string name="type_a_message">Type a message</string>
+
+    <bool name="is_right_to_left">false</bool>
 </resources>

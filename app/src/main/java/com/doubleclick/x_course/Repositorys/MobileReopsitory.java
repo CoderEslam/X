@@ -20,6 +20,7 @@ public class MobileReopsitory {
 
     public void getMobileDate() {
         referenceMob = FirebaseDatabase.getInstance().getReference().child("Mobile");
+        referenceMob.keepSynced(true);
         referenceMob.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {

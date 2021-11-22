@@ -56,6 +56,7 @@ public class LoadDataRepository {
 
     public void loadUserData() {
         AllPlayListsReferanc = FirebaseDatabase.getInstance().getReference().child("AllPlayLists");
+        AllPlayListsReferanc.keepSynced(true);
         EmailsRef = FirebaseDatabase.getInstance().getReference().child("Emails");
         EmailsRef.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override

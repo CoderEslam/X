@@ -10,3 +10,4 @@ rootProject.name = "X_Course"
 include ':app'
 //include ':RecoredView'
 //include ':shimmerlayout'
+include ':AudioPlayer'

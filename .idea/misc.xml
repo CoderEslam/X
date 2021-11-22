@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/AudioPlayer/src/main/res/drawable/ic_pause_white_24dp.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/AudioPlayer/src/main/res/layout/main_view.xml" value="0.2604166666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_basket_animated.xml" value="0.2723076923076923" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_bg_mic.xml" value="0.2765625" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/RecoredView/src/main/res/drawable/recv_ic_arrow.xml" value="0.2765625" />
@@ -34,6 +36,7 @@
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/ic_add.xml" value="0.2765625" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/ic_baseline_close_24.xml" value="0.19375" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.2765625" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/ic_pause_white_24dp.xml" value="0.2078125" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/item_course.xml" value="0.19375" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/item_green.xml" value="0.19375" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/drawable/play.xml" value="0.19375" />
@@ -43,13 +46,14 @@
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_about_course.xml" value="0.2" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_admin.xml" value="0.24635416666666668" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_advertisement.xml" value="0.22" />
-        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_chat.xml" value="0.25" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_chat.xml" value="0.2" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_course.xml" value="0.25" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_main.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_navigation_drawer.xml" value="0.2" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_record.xml" value="0.24635416666666668" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_requstes.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_video.xml" value="0.23229166666666667" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_view.xml" value="0.22" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/activity_view_pager.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/add_diploma.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/cart_favorite_item.xml" value="0.24635416666666668" />
@@ -82,7 +86,10 @@
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/item_option.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/item_request.xml" value="0.22" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/item_spinner.xml" value="0.22" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/layout_chatting.xml" value="0.19166666666666668" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/main_view.xml" value="0.19166666666666668" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/menu_left_drawer.xml" value="0.17760416666666667" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/record_view.xml" value="0.19166666666666668" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/slider_image_layout.xml" value="0.19" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/slids_ad_banner.xml" value="0.24635416666666668" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/user_item.xml" value="0.17760416666666667" />
@@ -90,6 +97,7 @@
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/layout/you_tube_post.xml" value="0.33" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/menu/add.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/menu/main_menu.xml" value="0.24635416666666668" />
+        <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2078125" />
         <entry key="..\:/Users/eslam/AndroidStudioProjects/XTeam/X_Course/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.19375" />
         <entry key="..\:/Users/eslam/AppData/Local/Android/Sdk/platforms/android-31/data/res/layout/simple_list_item_1.xml" value="0.17760416666666667" />
         <entry key="..\:/Users/eslam/AppData/Local/Android/Sdk/platforms/android-31/data/res/layout/simple_spinner_item.xml" value="0.17760416666666667" />

@@ -71,7 +71,7 @@
                 android:id="@+id/promo_youtube"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="promo youtube id url*" />
+                android:hint="promo youtube id url* (Se8j5uolD7Q)" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

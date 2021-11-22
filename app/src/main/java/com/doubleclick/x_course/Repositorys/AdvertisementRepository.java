@@ -1,14 +1,10 @@
 package com.doubleclick.x_course.Repositorys;
 
-import androidx.annotation.NonNull;
-
 import com.doubleclick.x_course.Model.Advertisement;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -24,6 +20,7 @@ public class AdvertisementRepository {
 
     public void LoadAdvertisement(){
         referenceAdvertisement= FirebaseDatabase.getInstance().getReference().child("Advertisement");
+        referenceAdvertisement.keepSynced(true);
         referenceAdvertisement.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {

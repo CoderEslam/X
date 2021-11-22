@@ -1,16 +1,10 @@
 package com.doubleclick.x_course.Repositorys;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
-
-import com.doubleclick.x_course.Adapter.DiplomasAdapter;
 import com.doubleclick.x_course.Model.Diploma;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -28,6 +22,7 @@ public class DiplomaRepository {
     public ArrayList<Diploma> AllDiploma() {
         diplomasArrayList = new ArrayList<>();
         referenceAllPlayList = FirebaseDatabase.getInstance().getReference().child("AllPlayLists");
+        referenceAllPlayList.keepSynced(true);
         referenceAllPlayList.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {

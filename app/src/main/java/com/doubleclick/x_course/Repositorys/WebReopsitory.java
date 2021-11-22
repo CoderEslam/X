@@ -21,6 +21,7 @@ public class WebReopsitory {
 
     public void getWebDate() {
         referenceWeb = FirebaseDatabase.getInstance().getReference().child("Web");
+        referenceWeb.keepSynced(true);
         referenceWeb.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {

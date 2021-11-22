@@ -82,12 +82,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, ChatActivity.class);
                 intent.putExtra("userid", user.getId());
+                intent.putExtra("iamgeFriend",user.getImageURL());
+                intent.putExtra("nameFriend",user.getUsername());
                 try {
                     if (!user.getWhatsapp().isEmpty()){
                         intent.putExtra("whtatsapp",user.getWhatsapp());
                     }
                 }catch (NullPointerException e){
-
                 }
                 mContext.startActivity(intent);
             }
@@ -148,6 +149,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                             last_msg.setText(theLastMessage);
                         }else if (type.equals("image")){
                             last_msg.setText("image");
+                        }else if (type.equals("voice")){
+                            last_msg.setText("voice");
                         }
                         break;
                 }

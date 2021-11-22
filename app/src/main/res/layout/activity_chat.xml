@@ -9,6 +9,7 @@
 
 
     <androidx.appcompat.widget.Toolbar
+        android:elevation="2dp"
         android:id="@+id/toolbar2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,6 +26,7 @@
 
 
         <LinearLayout
+            android:layout_weight="2"
             android:gravity="center"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
@@ -38,6 +40,7 @@
                 tools:src="@drawable/account_circle_24" />
 
             <TextView
+                android:id="@+id/nameFriend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
@@ -48,7 +51,7 @@
         </LinearLayout>
 
         <TextView
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -58,6 +61,7 @@
             android:textSize="30sp" />
 
             <com.airbnb.lottie.LottieAnimationView
+                android:layout_weight="1"
                 android:layout_gravity="center"
                 android:id="@+id/animationWhatApp"
                 android:layout_width="30dp"
@@ -68,6 +72,7 @@
                 />
 
             <com.airbnb.lottie.LottieAnimationView
+                android:layout_weight="1"
                 android:layout_gravity="center"
                 android:id="@+id/animationCalling"
                 android:layout_width="30dp"
@@ -81,16 +86,16 @@
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
-        app:stackFromEnd="true"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/ChatrecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/layout_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar2"
+        app:stackFromEnd="true"
         tools:listitem="@layout/fack_chat" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -141,6 +146,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
+            android:visibility="invisible"
             android:src="@drawable/ic_baseline_send_24"
             android:id="@+id/sendText"
             android:layout_width="50dp"

@@ -1,14 +1,10 @@
 package com.doubleclick.x_course.Repositorys;
 
-import androidx.annotation.NonNull;
-
 import com.doubleclick.x_course.Model.ItemCourse;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -25,6 +21,7 @@ public class ItemCourseRepository {
     public void getItems(){
 
         reference = FirebaseDatabase.getInstance().getReference().child("ItemCourse");
+        reference.keepSynced(true);
         reference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot snapshot) {

@@ -2,6 +2,7 @@ package com.doubleclick.x_course.Adapter;
 
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-
+import com.doubleclick.x_course.Chat.ViewActivity;
 import com.doubleclick.x_course.Model.Chat;
 import com.doubleclick.x_course.R;
+import com.doubleclick.x_course.ViewRecord.VoicePlayerView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -25,12 +27,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public static final int MSG_TYPE_LEFT = 0;
     public static final int MSG_TYPE_RIGHT = 1;
-
     private Context mContext;
     private List<Chat> mChat;
     private String imageurl;
 
     FirebaseUser fuser;
+
+    public MessageAdapter() {
+    }
 
     public MessageAdapter(Context mContext, List<Chat> mChat, String imageurl) {
         this.mChat = mChat;
@@ -66,6 +70,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     holder.show_message.setVisibility(View.GONE);
                     holder.imageSent.setVisibility(View.VISIBLE);
                     Glide.with(mContext).load(chat.getMessage()).placeholder(R.drawable.account_circle_24).into(holder.imageSent);
+                }else if (chat.getType().equals("voice")){
+                    holder.show_message.setVisibility(View.GONE);
+                    holder.imageSent.setVisibility(View.GONE);
+                    holder.voicePlayerView.setVisibility(View.VISIBLE);
+                    holder.voicePlayerView.setAudio(chat.getMessage());
                 }
             }
         }catch (NullPointerException e){
@@ -88,6 +97,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.txt_seen.setVisibility(View.GONE);
         }
 
+        holder.imageSent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent  intent = new Intent(holder.itemView.getContext(), ViewActivity.class);
+                intent.putExtra("image",chat.getMessage());
+                holder.itemView.getContext().startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -101,6 +119,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         public ImageView profile_image;
         public TextView txt_seen;
         public ImageView imageSent;
+        public VoicePlayerView voicePlayerView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -108,6 +127,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             profile_image = itemView.findViewById(R.id.profile_image);
             txt_seen = itemView.findViewById(R.id.txt_seen);
             imageSent = itemView.findViewById(R.id.imageSent);
+            voicePlayerView = itemView.findViewById(R.id.voicePlayerView);
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
