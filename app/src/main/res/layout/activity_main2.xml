@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.doubleclick.x_course.flowingdrawer.FlowingDrawer
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:edMenuBackground="@color/colorBgDrawer"
+    app:edMenuSize="260dp"
+    app:edPosition="1">
+
+    <include
+        layout="@layout/content_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--menu-->
+    <com.doubleclick.x_course.flowingdrawer.FlowingMenuLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/searchContact"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorBg"
+                android:drawableLeft="@drawable/places_ic_search"
+                android:drawablePadding="12dp"
+                android:drawableStart="@drawable/places_ic_search"
+                android:gravity="center_vertical"
+                android:hint="@string/hint_search"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:singleLine="true" />
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/menu_recycler_view_swipe_refresh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/searchContact">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/menu_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        </RelativeLayout>
+
+    </com.doubleclick.x_course.flowingdrawer.FlowingMenuLayout>
+
+</com.doubleclick.x_course.flowingdrawer.FlowingDrawer>

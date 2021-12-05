@@ -1,19 +1,5 @@
 package com.doubleclick.x_course;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -22,11 +8,20 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
@@ -39,23 +34,15 @@ import com.doubleclick.x_course.CustomNavigation.Menu.DrawerAdapter;
 import com.doubleclick.x_course.CustomNavigation.Menu.DrawerItem;
 import com.doubleclick.x_course.CustomNavigation.Menu.SimpleItem;
 import com.doubleclick.x_course.Help.HelpFragment;
-import com.doubleclick.x_course.Model.Diploma;
-import com.doubleclick.x_course.Model.User;
-import com.doubleclick.x_course.Repositorys.MobileReopsitory;
+import com.doubleclick.x_course.PyChat.models.User;
 import com.doubleclick.x_course.ViewModel.GraphicDesignViewModel;
 import com.doubleclick.x_course.ViewModel.MobileViewModel;
 import com.doubleclick.x_course.ViewModel.UserViewModel;
 import com.doubleclick.x_course.ViewModel.WebViewModel;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -91,11 +78,10 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Drawe
         networkInfo = connectivityManager.getActiveNetworkInfo();
         animation_no_wifi = findViewById(R.id.animation_no_wifi);
         mAuth = FirebaseAuth.getInstance();
-        if (networkInfo != null && networkInfo.isConnected() && mAuth != null) {
+        if (mAuth != null && networkInfo != null && networkInfo.isConnected()) {
             try {
-
-
                 userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                userViewModel.LoadById(mAuth.getCurrentUser().getUid().toString());
                 animation_no_wifi.setVisibility(View.GONE);
                 toolbar = findViewById(R.id.toolbar);
                 toolbar.setTitle("Courses");
@@ -106,18 +92,18 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Drawe
                         try {
                             MainFragment mainFragment = new MainFragment();
                             if (user.getEmail() != null) {
-                                mainFragment.newInstance(user.getEmail(), user.getId(), user.getUsername(), user.getImageURL());
+                                mainFragment.newInstance(user.getEmail(), user.getId(), user.getUsername(), user.getImage());
                                 UserId = user.getId();
                             }
                             TextView nameProfile = findViewById(R.id.profileName);
                             CircleImageView profileImage = findViewById(R.id.profileImage);
                             nameProfile.setText(user.getUsername());
                             try {
-                                if (user.getImageURL().equals("default")) {
+                                if (user.getImage().equals("default")) {
                                     Toast.makeText(NavigationDrawerActivity.this, "put an image profile", Toast.LENGTH_LONG).show();
                                     getSupportFragmentManager().beginTransaction().replace(R.id.container, new AccountFragment()).commit();
                                 } else {
-                                    Glide.with(NavigationDrawerActivity.this).load(user.getImageURL())
+                                    Glide.with(NavigationDrawerActivity.this).load(user.getImage())
                                             .placeholder(R.drawable.account_circle_24)
                                             .into(profileImage);
                                 }
@@ -159,7 +145,7 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Drawe
                 //to selected it during opening
                 adapter.setSelected(POS_MAIN_COURSE_FRAGMENT);
             } catch (NullPointerException e) {
-                Log.e("NavigationDrawerActivity: ",e.getMessage());
+                Log.e("NavigationDrawer: ", e.getMessage());
             }
         } else {
             animation_no_wifi.setVisibility(View.VISIBLE);
@@ -233,12 +219,13 @@ public class NavigationDrawerActivity extends AppCompatActivity implements Drawe
                     }
                     break;
                 case POS_CHAT:
-                    if (UserId != null) {
-                        Intent intent = new Intent(NavigationDrawerActivity.this, ViewPagerActivity.class);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(NavigationDrawerActivity.this, "Login first", Toast.LENGTH_LONG).show();
-                    }
+//                    if (UserId != null) {
+                        Intent intentChat = new Intent(NavigationDrawerActivity.this, ViewPagerActivity.class);
+//                        Intent intentChat = new Intent(NavigationDrawerActivity.this, SplashActivity.class);
+                        startActivity(intentChat);
+//                    } else {
+//                        Toast.makeText(NavigationDrawerActivity.this, "Login first", Toast.LENGTH_LONG).show();
+//                    }
                     break;
                 case POS_HELP:
                     showFragment(new HelpFragment());

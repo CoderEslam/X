@@ -1,14 +1,11 @@
 package com.doubleclick.x_course.CustomNavigation;
 
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
@@ -16,15 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.doubleclick.x_course.Adapter.DiplomasAdapter;
@@ -34,7 +22,6 @@ import com.doubleclick.x_course.Model.Advertisement;
 import com.doubleclick.x_course.Model.Diploma;
 import com.doubleclick.x_course.Model.HomePage;
 import com.doubleclick.x_course.Model.ItemCourse;
-import com.doubleclick.x_course.NavigationDrawerActivity;
 import com.doubleclick.x_course.R;
 import com.doubleclick.x_course.ViewModel.AdvertisementViewModel;
 import com.doubleclick.x_course.ViewModel.GraphicDesignViewModel;
@@ -42,19 +29,11 @@ import com.doubleclick.x_course.ViewModel.ItemViewModel;
 import com.doubleclick.x_course.ViewModel.MainViewModel;
 import com.doubleclick.x_course.ViewModel.MobileViewModel;
 import com.doubleclick.x_course.ViewModel.WebViewModel;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.todkars.shimmer.ShimmerRecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainFragment extends Fragment {
@@ -83,8 +62,8 @@ public class MainFragment extends Fragment {
     private ShimmerRecyclerView main_courses;
     LifecycleOwner lifecycleOwner;
     ViewModelStoreOwner viewModelStoreOwner;
-    private ConnectivityManager connectivityManager;
-    private NetworkInfo networkInfo;
+//    private ConnectivityManager connectivityManager;
+//    private NetworkInfo networkInfo;
     private ItemViewModel itemViewModel;
 //    private String names[] = {"Android", "Web", "GraphicDesgin"};
 //    private int icons[] = {R.drawable.android, R.drawable.web, R.drawable.graphic_};
@@ -113,8 +92,8 @@ public class MainFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
         setHasOptionsMenu(true);
-        connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        networkInfo = connectivityManager.getActiveNetworkInfo();
+//        connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+//        networkInfo = connectivityManager.getActiveNetworkInfo();
         if (mAuth != null && firebaseUser != null) {
             mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
             advertisementViewModel = new ViewModelProvider(this).get(AdvertisementViewModel.class);
@@ -139,7 +118,7 @@ public class MainFragment extends Fragment {
                 itemCourseAdapter.onClickItemListener(new ItemCourseAdapter.itemListener() {
                     @Override
                     public void mListener(int postion) {
-                        if (postion == 0 && networkInfo != null && networkInfo.isConnected()) {
+                        if (postion == 0) {
                             mobileViewModel = new ViewModelProvider(viewModelStoreOwner).get(MobileViewModel.class);
                             mobileViewModel.getMobileData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                                 @Override
@@ -150,12 +129,12 @@ public class MainFragment extends Fragment {
                                     }
                                 }
                             });
-                        } else if (postion == 1 && networkInfo != null && networkInfo.isConnected()) {
+                        } else if (postion == 1 ) {
                             webViewModel = new ViewModelProvider(viewModelStoreOwner).get(WebViewModel.class);
                             webViewModel.getWebData().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                                 @Override
                                 public void onChanged(ArrayList<Diploma> diplomas) {
-                                    if (networkInfo != null && networkInfo.isConnected() && diplomas.size() != 0) {
+                                    if (diplomas.size() != 0) {
                                         LoadAllDiplomas(diplomas);
                                         loadingAnimView.setVisibility(View.GONE);
                                     } else {
@@ -166,7 +145,7 @@ public class MainFragment extends Fragment {
 
                                 }
                             });
-                        } else if (postion == 2 && networkInfo != null && networkInfo.isConnected()) {
+                        } else if (postion == 2 ) {
                             graphicDesignViewModel = new ViewModelProvider(viewModelStoreOwner).get(GraphicDesignViewModel.class);
                             graphicDesignViewModel.getGraphicDesign().observe(lifecycleOwner, new Observer<ArrayList<Diploma>>() {
                                 @Override
@@ -191,7 +170,7 @@ public class MainFragment extends Fragment {
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         recycler_Advertisement.setLayoutManager(linearLayoutManager);
         loadingAnimView = view.findViewById(R.id.loadingAnimView);
-        if (mAuth != null && firebaseUser != null && networkInfo != null && networkInfo.isConnected()) {
+//        if (mAuth != null  && networkInfo != null && networkInfo.isConnected()) {
             mainViewModel.getLiveData().observe(getViewLifecycleOwner(), new Observer<ArrayList<Diploma>>() {
                 @Override
                 public void onChanged(ArrayList<Diploma> diplomas) {
@@ -216,9 +195,9 @@ public class MainFragment extends Fragment {
                     }
                 }
             });
-        } else {
-            loadingAnimView.setVisibility(View.GONE);
-        }
+//        } else {
+//            loadingAnimView.setVisibility(View.GONE);
+//        }
 
         return view;
     }

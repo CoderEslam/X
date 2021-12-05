@@ -10,11 +10,13 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animationCalling"
-        android:layout_width="244dp"
-        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_margin="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/et_Name"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3"
         app:lottie_autoPlay="true"
@@ -33,8 +35,9 @@
         android:scaleType="center"
         android:scaleX="1"
         android:src="@drawable/top_shape"
+        app:layout_constraintBottom_toTopOf="@+id/animationCalling"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="UseAppTint" />
@@ -77,8 +80,9 @@
         android:src="@drawable/bottom_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/withPhone"
         tools:ignore="UseAppTint" />
 
     <EditText
@@ -128,7 +132,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:elevation="2dp"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -197,14 +201,28 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/left_right_margin16"
         android:layout_marginEnd="@dimen/left_right_margin16"
-        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_button"
         android:text="@string/CONTINUE"
         android:textAllCaps="false"
         android:textColor="@color/darkBlue"
         android:textSize="@dimen/et_Enter"
+        app:layout_constraintBottom_toTopOf="@+id/withPhone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_Password" />
+
+    <TextView
+        android:id="@+id/withPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Sign Up with phone!"
+        android:textColor="@color/white"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/imageView12"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@+id/btn_signup" />
 </androidx.constraintlayout.widget.ConstraintLayout>

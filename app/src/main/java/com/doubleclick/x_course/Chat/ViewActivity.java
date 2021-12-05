@@ -74,7 +74,6 @@ public class ViewActivity extends AppCompatActivity implements AudioRecordView.R
         containerView.findViewById(R.id.imageViewTitleIcon).setOnClickListener(this);
         containerView.findViewById(R.id.imageViewMenu).setOnClickListener(this);
 
-
         audioRecordView.setAttachmentOptions(AttachmentOption.getDefaultList(), this);
 
         audioRecordView.removeAttachmentOptionAnimation(false);

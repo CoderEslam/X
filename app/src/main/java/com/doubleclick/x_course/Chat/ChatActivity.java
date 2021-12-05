@@ -6,22 +6,26 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaRecorder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +35,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -42,15 +50,21 @@ import com.devlomi.record_view.RecordButton;
 import com.devlomi.record_view.RecordView;
 import com.doubleclick.x_course.API.APIService;
 import com.doubleclick.x_course.Adapter.MessageAdapter;
+import com.doubleclick.x_course.AudioRecordWhatsapp.AttachmentOption;
+import com.doubleclick.x_course.AudioRecordWhatsapp.AttachmentOptionsListener;
 import com.doubleclick.x_course.Model.Chat;
-import com.doubleclick.x_course.Model.User;
 import com.doubleclick.x_course.Notifications.Client;
 import com.doubleclick.x_course.Notifications.Data;
 import com.doubleclick.x_course.Notifications.MyResponse;
 import com.doubleclick.x_course.Notifications.Sender;
 import com.doubleclick.x_course.Notifications.Token;
 import com.doubleclick.x_course.Premissions.Permissions;
+import com.doubleclick.x_course.PyChat.models.User;
 import com.doubleclick.x_course.R;
+import com.doubleclick.x_course.RoomDataBase.AddChatViewModel;
+import com.doubleclick.x_course.UserInfo.UserInfoActivity;
+import com.doubleclick.x_course.ViewModel.ChatsViewModel;
+import com.doubleclick.x_course.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -63,14 +77,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
+import com.vanniktech.emoji.EmojiPopup;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,41 +109,85 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements AttachmentOptionsListener {
 
     private CircleImageView profile_image;
     private FirebaseUser fuser;
     private DatabaseReference reference;
     private EditText et_text_send;
-    private MessageAdapter messageAdapter;
+    //    private MessageAdapter messageAdapter;
     private List<Chat> mchat;
     private RecyclerView recyclerView;
-    private Intent intent;
     private ValueEventListener seenListener;
-    private String userid, audioPath;
+    private String userid, audioPath, MyName;
     private APIService apiService;
     private LottieAnimationView animationWhatApp, animationCalling;
     private String numberWhats = null;
     boolean notify = false;
-    //    private AudioRecorder audioRecorder;
-//    private File recordFile;
-    private ImageView btnDataSend;
+    private ImageView emotion;
     private final int REQUEST_Code = 20;
-    StorageReference storageReference;
+    private StorageReference storageReference;
     private Uri imageUri;
     private StorageTask uploadTask;
     private ConstraintLayout layout_text;
     private MediaRecorder mediaRecorder;
     private TextView nameFriend;
     private Permissions permissions;
+    private AddChatViewModel addChatViewModel;
+    private RecordButton sendRecord;
+    private ImageView sendText, attach_file;
+    private RecordView recordView;
+    private boolean cklicked = true;
+    private ChatsViewModel chatsViewModel;
+    private FirebaseFirestore firestore;
+    private UserViewModel userViewModel, MyNameViewModel;
+    private ConnectivityManager connectivityManager;
+    private NetworkInfo networkInfo;
+    private LinearLayout info;
+    private User mUser;
+    private ListenerRegistration listenerRegistration;
+    private List<Chat> DatabaseList = new ArrayList<>();
+    LifecycleOwner lifecycleOwner;
+    private MessageAdapter messageAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-//        audioRecorder = new AudioRecorder();
-        intent = getIntent();
+        lifecycleOwner = this;
+        try {
+            userid = getIntent().getStringExtra("userid");
+        } catch (NullPointerException e) {
+        }
+        addChatViewModel = new ViewModelProvider(this).get(AddChatViewModel.class); //Room Database
+        addChatViewModel.getAllChats(FirebaseAuth.getInstance().getCurrentUser().getUid().toString(), userid);
+        chatsViewModel = new ViewModelProvider(this).get(ChatsViewModel.class);//FireStore Database
+        try {
+            userid = getIntent().getStringExtra("userid");
+        } catch (NullPointerException e) {
+        }
+//        userViewModel = new UserViewModel(getIntent().getStringExtra("userid"));
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        MyNameViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        MyNameViewModel.LoadById(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+        MyNameViewModel.getUserLiveData().observe(this, new Observer<User>() {
+            @Override
+            public void onChanged(User user) {
+                MyName = user.getUsername();
+            }
+        });
+        userViewModel.LoadById(userid);
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        networkInfo = connectivityManager.getActiveNetworkInfo();
+        info = findViewById(R.id.info);
+        userViewModel.getUserLiveData().observe(this, new Observer<User>() {
+            @Override
+            public void onChanged(User user) {
+                mUser = user;
+            }
+        });
+        firestore = FirebaseFirestore.getInstance();
         profile_image = findViewById(R.id.profile_image_Chat);
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         animationWhatApp = findViewById(R.id.animationWhatApp);
@@ -123,17 +195,17 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.ChatrecyclerView);
         nameFriend = findViewById(R.id.nameFriend);
         recyclerView.setHasFixedSize(true);
-        btnDataSend = findViewById(R.id.btnDataSend);
+        emotion = findViewById(R.id.emotion);
         et_text_send = findViewById(R.id.text_send);
         layout_text = findViewById(R.id.layout_text);
+        attach_file = findViewById(R.id.attach_file);
         storageReference = FirebaseStorage.getInstance().getReference("ImagesChat");
-        RecordButton sendRecord = findViewById(R.id.sendRecord);
-        ImageView sendText = findViewById(R.id.sendText);
-        RecordView recordView = findViewById(R.id.recordView);
+        sendRecord = findViewById(R.id.sendRecord);
+        sendText = findViewById(R.id.sendText);
+        recordView = findViewById(R.id.recordView);
         sendRecord.setRecordView(recordView);
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        userid = intent.getStringExtra("userid");
-        numberWhats = intent.getStringExtra("whtatsapp");
+        numberWhats = getIntent().getStringExtra("whtatsapp");
         reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
         reference.keepSynced(true);
         sendRecord.setListenForRecord(true);
@@ -143,17 +215,112 @@ public class ChatActivity extends AppCompatActivity {
         permissions.isRecordingOk(ChatActivity.this);
         permissions.requestStorage(ChatActivity.this);
         permissions.requestRecording(ChatActivity.this);
-        if (getIntent().getStringExtra("iamgeFriend").equals("default")) {
-            profile_image.setImageResource(R.mipmap.ic_launcher);
-        } else {
-            //and this
-            Glide.with(getApplicationContext()).load(getIntent().getStringExtra("iamgeFriend")).into(profile_image);
+        EmojiPopup emojiPopup = EmojiPopup.Builder.fromRootView(findViewById(R.id.root_view)).build(et_text_send);
+        emotion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (cklicked) {
+                    emojiPopup.toggle();
+                    cklicked = false;
+                    emotion.setImageDrawable(getResources().getDrawable(R.drawable.keyboard));
+                } else {
+                    emojiPopup.dismiss();
+                    cklicked = true;
+                    emotion.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_insert_emoticon_24));
+                }
+            }
+        });
+        // to delete all data in my phone .
+//        addChatViewModel.deleteAllData();
+        if (networkInfo != null && networkInfo.isConnected()) {// from firestore
+            chatsViewModel.getMessageFromFireSTORE(userid);
+            chatsViewModel.ReturnMyMessages().observe(this, new Observer<List<Chat>>() {
+                @Override
+                public void onChanged(List<Chat> FireList) {
+                    /*addChatViewModel.getAllChatDatabase().observe(lifecycleOwner, new Observer<List<Chat>>() { // from room data base
+                        @Override
+                        public void onChanged(List<Chat> chats) {
+                            try {
+                                for (int i = 0; i < FireList.size(); i++) {
+                                    for (int j = 0; j < chats.size(); j++) {
+                                        if (FireList.get(i).getPushId().equals(chats.get(j).getPushId()) &&
+                                                FireList.get(i).getTime() == chats.get(j).getTime() &&
+                                                FireList.get(i).getType().equals(chats.get(j).getType()) &&
+                                                FireList.get(i).getMessage().equals(chats.get(j).getMessage()) &&
+                                                FireList.get(i).getSender().equals(chats.get(j).getSender()) &&
+                                                FireList.get(i).getReceiver().equals(chats.get(j).getReceiver())) {
+                                            FireList.remove(i);
+                                            Log.e("Remove = ", FireList.get(i).toString());
+                                        }
+                                    }
+                                }
+
+                            } catch (IndexOutOfBoundsException | NullPointerException e) {
+                                e.printStackTrace();
+                            } finally {
+                                for (Chat chat : FireList) {
+                                    if (chat.getSender().equals(fuser.getUid()) && chat.getReceiver().equals(userid) ||
+                                            chat.getReceiver().equals(fuser.getUid()) && chat.getSender().equals(userid)) {
+                                        addChatViewModel.insert(chat);
+                                    }
+                                }
+                            }
+                            ShowMessage(chats);
+
+                        }
+                    });*/
+                }
+            });
         }
+
+        addChatViewModel.getAllChatDatabase().observe(this, new Observer<List<Chat>>() {
+            @Override
+            public void onChanged(List<Chat> chats) {
+                Log.e("Test",chats.toString());
+            }
+        });
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Chat chat = messageAdapter.getMessage(position);
+                addChatViewModel.delete(chat);
+                try {
+                    firestore.collection("ChatList").document(chat.getPushId()).delete();
+                    FirebaseDatabase.getInstance().getReference("Chats").child(chat.getPushId()).removeValue();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).attachToRecyclerView(recyclerView);
+
+        info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userInfo();
+            }
+        });
+        try {
+            if (getIntent().getStringExtra("imageFriend").equals("default")) {
+                profile_image.setImageResource(R.mipmap.ic_launcher);
+            } else {
+                //and this
+                Glide.with(getApplicationContext()).load(getIntent().getStringExtra("imageFriend")).into(profile_image);
+            }
+        } catch (NullPointerException e) {
+
+        }
+
         //ListenForRecord must be false ,otherwise onClick will not be called
         sendRecord.setOnRecordClickListener(new OnRecordClickListener() {
             @Override
             public void onClick(View v) {
-//                Toast.makeText(ChatActivity.this, "RECORD BUTTON CLICKED", Toast.LENGTH_SHORT).show();
                 Log.d("RecordButton", "RECORD BUTTON CLICKED");
             }
         });
@@ -172,6 +339,7 @@ public class ChatActivity extends AppCompatActivity {
                     recordView.setVisibility(View.VISIBLE);
                     sendRecord.setListenForRecord(true);
                     layout_text.setVisibility(View.GONE);
+                    attach_file.setVisibility(View.VISIBLE);
                 } else {
                     layout_text.setVisibility(View.VISIBLE);
                     sendRecord.setListenForRecord(true);
@@ -179,6 +347,7 @@ public class ChatActivity extends AppCompatActivity {
                     sendRecord.setVisibility(View.GONE);
                     sendText.setVisibility(View.VISIBLE);
                     recordView.setVisibility(View.GONE);
+                    attach_file.setVisibility(View.GONE);
                     if (sendRecord.isListenForRecord()) {
                         sendRecord.setListenForRecord(false);
                     }
@@ -213,12 +382,6 @@ public class ChatActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 sendText.setVisibility(View.GONE);
-//                try {
-//                    recordFile = new File(getFilesDir(), UUID.randomUUID().toString() + ".3gp");
-//                    audioRecorder.start(recordFile.getPath());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
                 Log.d("RecordView", "onStart");
                 Toast.makeText(ChatActivity.this, "OnStartRecord", Toast.LENGTH_SHORT).show();
             }
@@ -245,11 +408,6 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 sendText.setVisibility(View.VISIBLE);
                 sendRecodingMessage(audioPath);
-//                String time = getHumanTimeText(recordTime);
-//                Toast.makeText(ChatActivity.this, "onFinishRecord - Recorded Time is: " + time + " File saved at " + recordFile.getPath(), Toast.LENGTH_SHORT).show();
-//                Log.d("RecordView", "onFinish" + " Limit Reached? ");
-//                Log.d("RecordTime", time);
-//                sendFile(fuser.getUid(), userid, recordFile.getPath());
             }
 
             @Override
@@ -310,40 +468,57 @@ public class ChatActivity extends AppCompatActivity {
                     startActivity(intentCall);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(ChatActivity.this, "You don't have call app!", Toast.LENGTH_LONG).show();
-
                 }
-
             } else {
                 Toast.makeText(getApplicationContext(), "your friend doen't has a  Number", Toast.LENGTH_SHORT).show();
             }
         });
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (user.getImageURL().equals("default")) {
-                    profile_image.setImageResource(R.mipmap.ic_launcher);
-                } else {
-                    //and this
-                    Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
-                }
+        // to read message from realtime database
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                User user = dataSnapshot.getValue(User.class);
+//                if (user.getImageURL().equals("default")) {
+//                    profile_image.setImageResource(R.mipmap.ic_launcher);
+//                } else {
+//                    //and this
+//                    Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
+//                }
+//                readMesagges(fuser.getUid(), userid);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
-                readMesagges(fuser.getUid(), userid, user.getImageURL());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        readMesagges(fuser.getUid(), userid); // not here.
         seenMessage(userid);
         PermissionHandler();
-        btnDataSend.setOnClickListener(new View.OnClickListener() {
+        attach_file.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openFiles();
             }
         });
+
+
+    }
+
+    List<Chat> chatList = new ArrayList<>();
+
+    private void ShowMessage(List<Chat> chats) {
+        chatList.clear();
+        for (Chat chat : chats) {
+            if (chat.getSender().equals(fuser.getUid()) && chat.getReceiver().equals(userid)
+                    ||
+                    chat.getSender().equals(userid) && chat.getReceiver().equals(fuser.getUid())) {
+                chatList.add(chat);
+            }
+        }
+        messageAdapter = new MessageAdapter(ChatActivity.this, chatList);
+        recyclerView.setAdapter(messageAdapter);
     }
 
     private void openFiles() {
@@ -355,9 +530,24 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private boolean PermissionHandler() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
+        Dexter.withContext(this)
+                .withPermission(Manifest.permission.RECORD_AUDIO)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        sendRecord.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        sendRecord.setEnabled(false);
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+                    }
+                }).check();
         boolean recordPermissionAvailable = ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED;
         if (recordPermissionAvailable) {
             return true;
@@ -366,15 +556,14 @@ public class ChatActivity extends AppCompatActivity {
         return false;
     }
 
-
-    private void seenMessage(final String userid) {
+    private void seenMessage(final String friendid) {
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Chat chat = snapshot.getValue(Chat.class);
-                    if (chat.getReceiver().equals(fuser.getUid()) && chat.getSender().equals(userid)) {
+                    if (chat.getReceiver().equals(fuser.getUid()) && chat.getSender().equals(friendid)) {
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("isseen", true);
                         snapshot.getRef().updateChildren(hashMap);
@@ -387,21 +576,51 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        // on Fire store
+        listenerRegistration = firestore.collection("ChatList").orderBy("time").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot documentSnapshot : value.getDocuments()) {
+                    Chat messageModel = documentSnapshot.toObject(Chat.class);
+                    if (messageModel.getSender().equals(fuser.getUid()) && messageModel.getReceiver().equals(friendid) ||
+                            messageModel.getReceiver().equals(fuser.getUid()) && messageModel.getSender().equals(friendid)) {
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("isseen", true);
+                        documentSnapshot.getReference().update(hashMap);
+//                        documentSnapshot.getData().put("isseen",true);
+
+                    }
+                }
+
+            }
+        });
+
+
     }
 
     private void sendMessage(String sender, final String receiver, String message) {
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        Date date = new Date();
         HashMap<String, Object> hashMap = new HashMap<>();
-        String pushId = reference.push().getKey().toString();
+//        String pushId = reference.push().getKey().toString();
+        String pushId = fuser.getUid() + date.getTime();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("message", message);
         hashMap.put("type", "text");
         hashMap.put("isseen", false);
-        hashMap.put("imageId", pushId);
+        hashMap.put("pushId", pushId);
+        hashMap.put("time", date.getTime());
+//        addChatViewModel.insert(new Chat(sender, receiver, message, "text", pushId, date.getTime()));
         reference.child("Chats").child(pushId).setValue(hashMap);
         // add user to chat fragment
+        firestore.collection("ChatList").document(pushId).set(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                sendNotifiaction(receiver, MyName, message);
+            }
+        });
         final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
                 .child(fuser.getUid())
                 .child(userid);
@@ -419,30 +638,10 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
         final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
                 .child(userid)
                 .child(fuser.getUid());
         chatRefReceiver.child("id").setValue(fuser.getUid());
-
-        final String msg = message;
-
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (notify) {
-                    sendNotifiaction(receiver, user.getUsername(), msg);
-                }
-                notify = false;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 
     private void sendNotifiaction(String receiver, final String username, final String message) {
@@ -488,47 +687,6 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    private void readMesagges(final String myid, final String userid, final String imageurl) {
-        mchat = new ArrayList<>();
-
-        reference = FirebaseDatabase.getInstance().getReference("Chats");
-        reference.keepSynced(true);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mchat.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if (snapshot.hasChild("type")) {
-                        Chat chat = snapshot.getValue(Chat.class);
-                        if (chat.getReceiver().equals(myid) && chat.getSender().equals(userid) ||
-                                chat.getReceiver().equals(userid) && chat.getSender().equals(myid)) {
-                            mchat.add(chat);
-                        }
-
-                        messageAdapter = new MessageAdapter(ChatActivity.this, mchat, imageurl);
-                        recyclerView.setAdapter(messageAdapter);
-                    } else {
-                        Chat chat = snapshot.getValue(Chat.class);
-                        chat.setType(null);
-                        if (chat.getReceiver().equals(myid) && chat.getSender().equals(userid) ||
-                                chat.getReceiver().equals(userid) && chat.getSender().equals(myid)) {
-                            mchat.add(chat);
-                        }
-
-                        messageAdapter = new MessageAdapter(ChatActivity.this, mchat, imageurl);
-                        recyclerView.setAdapter(messageAdapter);
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     private void currentUser(String userid) {
         SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
         editor.putString("currentuser", userid);
@@ -537,6 +695,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void status(String status) {
         reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
+        reference.keepSynced(true);
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("status", status);
 
@@ -553,7 +712,12 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        reference.removeEventListener(seenListener);
+        try {
+            reference.removeEventListener(seenListener);
+            listenerRegistration.remove();
+        } catch (NullPointerException e) {
+
+        }
         status("offline");
         currentUser("none");
     }
@@ -568,8 +732,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_Code && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            sendImage(fuser.getUid(), userid);
+            sendImage(fuser.getUid(), userid, data.getData());
         }
     }
 
@@ -579,7 +742,7 @@ public class ChatActivity extends AppCompatActivity {
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-    private void sendImage(String sender, String FriendId) {
+    private void sendImage(String sender, String FriendId, Uri imageUri) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading");
         progressDialog.show();
@@ -600,18 +763,50 @@ public class ChatActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                        String pushId = reference.push().getKey().toString();
                         HashMap<String, Object> hashMap = new HashMap<>();
+                        Date date = new Date();
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                        reference.keepSynced(true);
+//                        String pushId = reference.push().getKey().toString();
+                        String pushId = fuser.getUid() + date.getTime();
                         hashMap.put("sender", sender);
                         hashMap.put("receiver", FriendId);
                         hashMap.put("message", mUri);
                         hashMap.put("type", "image");
                         hashMap.put("isseen", false);
-                        hashMap.put("imageId", pushId);
+                        hashMap.put("pushId", pushId);
+                        hashMap.put("time", date.getTime());
                         reference.child("Chats").child(pushId).setValue(hashMap);
-                        sendNotifiaction(FriendId, "you have", "Image");
+//                        addChatViewModel.insert(new Chat(sender, FriendId, mUri, "image", pushId, date.getTime()));
+                        firestore.collection("ChatList").document(pushId).set(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                sendNotifiaction(userid, MyName, "image");
+                            }
+                        });
 
+                        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
+                                .child(fuser.getUid())
+                                .child(userid);
+
+                        chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (!dataSnapshot.exists()) {
+                                    chatRef.child("id").setValue(userid);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                        final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
+                                .child(userid)
+                                .child(fuser.getUid());
+                        chatRefReceiver.child("id").setValue(fuser.getUid());
 
                         progressDialog.dismiss();
                     } else {
@@ -647,9 +842,18 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void userInfo() {
-//        Intent intent = new Intent(this, UserInfo.class);
-//        intent.putExtra("userID", userid);
-//        startActivity(intent);
+        Intent intent = new Intent(this, UserInfoActivity.class);
+        try {
+            intent.putExtra("nameFriend", getIntent().getStringExtra("nameFriend").toString());
+            intent.putExtra("whtatsapp", getIntent().getStringExtra("whtatsapp").toString());
+            intent.putExtra("imageFriend", getIntent().getStringExtra("imageFriend").toString());
+            intent.putExtra("BioFriend", getIntent().getStringExtra("BioFriend").toString());
+            intent.putExtra("CountryFriend", getIntent().getStringExtra("CountryFriend").toString());
+            intent.putExtra("StatusFriend", getIntent().getStringExtra("StatusFriend").toString());
+        } catch (NullPointerException e) {
+
+        }
+        startActivity(intent);
     }
 
     private void sendRecodingMessage(String audioPath) {
@@ -666,22 +870,64 @@ public class ChatActivity extends AppCompatActivity {
                         if (userid == null) {
                             Toast.makeText(ChatActivity.this, "No thing to send", Toast.LENGTH_SHORT).show();
                         } else {
+
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Chats");
                             Map<String, Object> map = new HashMap<>();
-                            String pushId = databaseReference.push().getKey().toString();
+                            Date date = new Date();
+//                            String pushId = databaseReference.push().getKey().toString();
+                            String pushId = fuser.getUid() + date.getTime();
                             map.put("sender", fuser.getUid());
                             map.put("receiver", userid);
                             map.put("message", url);
                             map.put("type", "voice");
                             map.put("isseen", false);
-                            map.put("imageId", pushId);
-                            sendNotifiaction(userid, "you have", "voice");
+                            map.put("pushId", pushId);
+                            map.put("time", date.getTime());
+                            firestore.collection("ChatList").document(pushId).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    sendNotifiaction(userid, MyName, "voice");
+//                                    addChatViewModel.insert(new Chat(fuser.getUid(), userid, url, "voice", pushId, date.getTime()));
+                                }
+                            });
                             databaseReference.child(pushId).setValue(map);
+                            final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Chatlist")
+                                    .child(fuser.getUid())
+                                    .child(userid);
+
+                            chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (!dataSnapshot.exists()) {
+                                        chatRef.child("id").setValue(userid);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            final DatabaseReference chatRefReceiver = FirebaseDatabase.getInstance().getReference("Chatlist")
+                                    .child(userid)
+                                    .child(fuser.getUid());
+                            chatRefReceiver.child("id").setValue(fuser.getUid());
+
                         }
                     }
                 });
             });
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // we can't becouse null pointer exaption
+//        chatsViewModel.resetAllMessages();
+//        addChatViewModel.getAllChatDatabase().removeObservers(this);
+
     }
 
     private String getFilePath() {
@@ -691,4 +937,33 @@ public class ChatActivity extends AppCompatActivity {
         return f.getPath();
     }
 
+    @Override
+    public void onClick(AttachmentOption attachmentOption) {
+        switch (attachmentOption.getId()) {
+            case AttachmentOption.DOCUMENT_ID:
+                showToast("Document Clicked");
+                break;
+            case AttachmentOption.CAMERA_ID:
+                showToast("Camera Clicked");
+                break;
+            case AttachmentOption.GALLERY_ID:
+                showToast("Gallery Clicked");
+                break;
+            case AttachmentOption.AUDIO_ID:
+                showToast("Audio Clicked");
+                break;
+            case AttachmentOption.LOCATION_ID:
+                showToast("Location Clicked");
+                break;
+            case AttachmentOption.CONTACT_ID:
+                showToast("Contact Clicked");
+                break;
+        }
+    }
+
+    private void showToast(String message) {
+        Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
 }

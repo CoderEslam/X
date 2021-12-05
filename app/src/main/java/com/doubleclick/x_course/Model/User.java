@@ -1,3 +1,4 @@
+/*
 package com.doubleclick.x_course.Model;
 
 public class User {
@@ -28,10 +29,6 @@ public class User {
     public void setBio(String bio) {
         this.bio = bio;
     }
-
-
-
-
 
     public String getCountry() {
         return Country;
@@ -105,3 +102,4 @@ public class User {
                 '}';
     }
 }
+*/

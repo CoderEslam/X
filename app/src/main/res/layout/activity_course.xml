@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/darkBlue"
-    tools:context=".CourseActivity">
+    tools:context=".CourseActivity"
+    app:layoutDescription="@xml/motion_scene"
+    tools:ignore="contentDescription">
     <!--is will be fragment -->
 
-
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clImageContainer"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <FrameLayout
         android:visibility="gone"
@@ -23,14 +32,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-     <com.google.android.youtube.player.YouTubePlayerView
-       android:id="@+id/Lectuer"
-       android:layout_width="match_parent"
-       android:layout_height="250dp"
-       app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintStart_toStartOf="parent"
-       app:layout_constraintTop_toTopOf="parent"
-       />
+    <com.google.android.youtube.player.YouTubePlayerView
+        android:id="@+id/Lectuer"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/ivPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_play"
+        app:layout_constraintBottom_toBottomOf="@+id/ivClear"
+        app:layout_constraintEnd_toStartOf="@+id/ivClear"
+        app:layout_constraintTop_toTopOf="@+id/ivClear" />
+
+    <ImageView
+        android:id="@+id/ivClear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:src="@drawable/ic_close"
+        app:layout_constraintBottom_toBottomOf="@+id/Lectuer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/Lectuer" />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -105,6 +134,7 @@
 
 
         <com.airbnb.lottie.LottieAnimationView
+            android:visibility="gone"
             android:id="@+id/loadingAnimView"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -132,4 +162,4 @@
         tools:listitem="@layout/you_tube_post" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

@@ -7,10 +7,6 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +16,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.bumptech.glide.Glide;
-import com.doubleclick.x_course.Model.User;
+import com.doubleclick.x_course.PyChat.models.User;
 import com.doubleclick.x_course.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -50,6 +49,8 @@ public class AccountFragment extends Fragment {
     CircleImageView image_profile;
     TextView username;
     EditText Country,whatsapp,Bio;
+
+
 
     DatabaseReference reference;
     FirebaseUser fuser;
@@ -115,11 +116,11 @@ public class AccountFragment extends Fragment {
                     Country.setText(user.getCountry());
                     whatsapp.setText(user.getWhatsapp());
                     Bio.setText(user.getBio());
-                    if (user.getImageURL().equals("default")) {
+                    if (user.getImage().equals("default")) {
                         image_profile.setImageResource(R.mipmap.ic_launcher);
                     } else {
                         try {
-                            Glide.with(getContext()).load(user.getImageURL()).into(image_profile);
+                            Glide.with(getContext()).load(user.getImage()).into(image_profile);
                         } catch (NullPointerException e) {
 
                         }
@@ -184,7 +185,7 @@ public class AccountFragment extends Fragment {
 
                         reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
                         HashMap<String, Object> map = new HashMap<>();
-                        map.put("imageURL", ""+mUri);
+                        map.put("image", ""+mUri);
                         reference.updateChildren(map);
 
                         progressDialog.dismiss();

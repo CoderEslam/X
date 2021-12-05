@@ -1,15 +1,8 @@
 package com.doubleclick.x_course.LogIn;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,11 +13,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.doubleclick.x_course.NavigationDrawerActivity;
+import com.doubleclick.x_course.PyChat.activities.SignInActivity;
 import com.doubleclick.x_course.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -49,6 +48,7 @@ public class SignupFragment extends Fragment {
     private DatabaseReference RootdatabaseReference;
     //    private FirebaseFirestore UserFirebaseFirestore;
     private final String EMAILPATTERN = "[a-zA-Z0-9._-]+@[a-z]+.[a-z]+";
+    private TextView withPhone;
 
     public SignupFragment() {
         // Required empty public constructor
@@ -74,6 +74,7 @@ public class SignupFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_signup, container, false);
 
         firebaseAuthentication = FirebaseAuth.getInstance();
+        withPhone= view.findViewById(R.id.withPhone);
 //        UserFirebaseFirestore = FirebaseFirestore.getInstance();
         //https://my-mall-70e39.firebaseio.com/
         RootdatabaseReference = FirebaseDatabase.getInstance().getReference();
@@ -84,6 +85,13 @@ public class SignupFragment extends Fragment {
         signupbtn = view.findViewById(R.id.btn_signup);
         signupProgressBar = view.findViewById(R.id.signupProgressBar);
         Exitbtn = view.findViewById(R.id.Back);
+        withPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =new Intent(getContext(), SignInActivity.class);
+                startActivity(intent);
+            }
+        });
         return view;
 
     }
@@ -172,19 +180,15 @@ public class SignupFragment extends Fragment {
                                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                                 String UserId = mAuth.getCurrentUser().getUid().toString();
                                 Map<Object, String> UserData = new HashMap<>();
-                                UserData.put("username", signupFullName.getText().toString());
-                                UserData.put("imageURL", "default");
+                                UserData.put("name", signupFullName.getText().toString());
+                                UserData.put("image", "default");
                                 UserData.put("id", UserId);
-                                UserData.put("search", signupFullName.getText().toString());
                                 UserData.put("email", signupEmail.getText().toString());
                                 SendUserToMainActivity();
                                 String CurrentUserID = firebaseAuthentication.getCurrentUser().getUid();
                                 RootdatabaseReference.child("Users").child(CurrentUserID).setValue(UserData);
-//                                    RootdatabaseReference.child("Users").child(CurrentUserID).setValue("New Account Created");
-//                                    RootdatabaseReference.child("USERS").child(CurrentUserID).setValue(UserData);
                                 Toast.makeText(getActivity(), "Account Created Successfully", Toast.LENGTH_LONG).show();
                                 signupProgressBar.setVisibility(View.INVISIBLE);
-
                             } else {
                                 String massege = task.getException().getMessage();
                                 Toast.makeText(getActivity(), "Error : " + massege, Toast.LENGTH_LONG).show();
@@ -193,8 +197,6 @@ public class SignupFragment extends Fragment {
                         }
                     });
 
-        } else {
-//            signupEmail.setError("Invaild Email!",errorIcon);
         }
     }
 

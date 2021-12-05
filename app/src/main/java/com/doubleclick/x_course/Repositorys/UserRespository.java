@@ -1,24 +1,14 @@
 package com.doubleclick.x_course.Repositorys;
 
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 
-import com.bumptech.glide.Glide;
-import com.doubleclick.x_course.CustomNavigation.MainFragment;
-import com.doubleclick.x_course.Model.User;
-import com.doubleclick.x_course.NavigationDrawerActivity;
-import com.doubleclick.x_course.R;
+import com.doubleclick.x_course.PyChat.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserRespository {
 
@@ -32,19 +22,24 @@ public class UserRespository {
         this.userListener = userListener;
         mAuth = FirebaseAuth.getInstance();
         UserId = mAuth.getCurrentUser().getUid().toString();
-        reference = FirebaseDatabase.getInstance().getReference().child("Users").child(UserId);
+        reference = FirebaseDatabase.getInstance().getReference().child("Users");
 
     }
 
-    public void LoadUserData(){
+    public void LoadUserData(String Id){
         if (mAuth!=null){
-            reference.addValueEventListener(new ValueEventListener() {
+            reference.child(Id).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     user = snapshot.getValue(User.class);
-                        if (user.getEmail() != null) {
+                    try {
+                        if (user.getId() != null) {
                             userListener.userListener(user);
                         }
+                    }catch (NullPointerException e){
+
+                    }
+
                 }
 
                 @Override

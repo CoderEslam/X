@@ -9,12 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.doubleclick.x_course.Chat.ChatActivity;
 import com.doubleclick.x_course.Model.Chat;
-import com.doubleclick.x_course.Model.User;
+import com.doubleclick.x_course.PyChat.models.User;
 import com.doubleclick.x_course.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,13 +32,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private Context mContext;
     private List<User> mUsers;
     private boolean ischat;
+    String theLastMessage, type;
 
-    String theLastMessage,type;
-
-    public UserAdapter(Context mContext, List<User> mUsers, boolean ischat){
+    public UserAdapter(Context mContext, List<User> mUsers, boolean ischat) {
         this.mUsers = mUsers;
         this.mContext = mContext;
         this.ischat = ischat;
+        Fragment fragment = new Fragment();
+
     }
 
     @NonNull
@@ -51,21 +53,26 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         final User user = mUsers.get(position);
-        holder.username.setText(user.getUsername());
-        if (user.getImageURL().equals("default")){
-            holder.profile_image.setImageResource(R.drawable.account_circle_24);
-        } else {
-            Glide.with(mContext).load(user.getImageURL()).into(holder.profile_image);
+        holder.username.setText(user.getName());
+        try {
+            if (user.getImage().equals("default")) {
+                holder.profile_image.setImageResource(R.drawable.account_circle_24);
+            } else {
+                Glide.with(mContext).load(user.getImage()).into(holder.profile_image);
+            }
+        }catch (NullPointerException e){
+
         }
 
-        if (ischat){
+
+        if (ischat) {
             lastMessage(user.getId(), holder.last_msg);
         } else {
             holder.last_msg.setVisibility(View.GONE);
         }
 
-        if (ischat){
-            if (user.getStatus().equals("online")){
+        if (ischat) {
+            if (user.getStatus().equals("online")) {
                 holder.img_on.setVisibility(View.VISIBLE);
                 holder.img_off.setVisibility(View.GONE);
             } else {
@@ -82,13 +89,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, ChatActivity.class);
                 intent.putExtra("userid", user.getId());
-                intent.putExtra("iamgeFriend",user.getImageURL());
-                intent.putExtra("nameFriend",user.getUsername());
+                intent.putExtra("imageFriend", user.getImage());
+                intent.putExtra("CountryFriend", user.getCountry());
+                intent.putExtra("BioFriend", user.getBio());
+                intent.putExtra("nameFriend", user.getName());
+                intent.putExtra("StatusFriend", user.getStatus());
                 try {
-                    if (!user.getWhatsapp().isEmpty()){
-                        intent.putExtra("whtatsapp",user.getWhatsapp());
+                    if (!user.getWhatsapp().isEmpty()) {
+                        intent.putExtra("whtatsapp", user.getWhatsapp());
                     }
-                }catch (NullPointerException e){
+                } catch (NullPointerException e) {
                 }
                 mContext.startActivity(intent);
             }
@@ -100,7 +110,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return mUsers.size();
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView username;
         public ImageView profile_image;
@@ -120,36 +130,41 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     //check for last message
-    private void lastMessage(final String userid, final TextView last_msg){
+    private void lastMessage(final String userid, final TextView last_msg) {
         theLastMessage = "default";
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Chats");
-
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.keepSynced(true);
+        reference.orderByChild("time").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Chat chat = snapshot.getValue(Chat.class);
-                    if (firebaseUser != null && chat != null) {
-                        if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid) ||
-                                chat.getReceiver().equals(userid) && chat.getSender().equals(firebaseUser.getUid())) {
-                            theLastMessage = chat.getMessage();
-                            type = chat.getType();
+                    try {
+                        if (firebaseUser != null && chat != null) {
+                            if (chat.getReceiver().equals(firebaseUser.getUid()) && chat.getSender().equals(userid) ||
+                                    chat.getReceiver().equals(userid) && chat.getSender().equals(firebaseUser.getUid())) {
+                                theLastMessage = chat.getMessage();
+                                type = chat.getType();
 
+                            }
                         }
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
+
                 }
 
-                switch (theLastMessage){
-                    case  "default":
+                switch (theLastMessage) {
+                    case "default":
                         last_msg.setText("No Message");
                         break;
                     default:
-                        if (type.equals("text")){
+                        if (type.equals("text")) {
                             last_msg.setText(theLastMessage);
-                        }else if (type.equals("image")){
+                        } else if (type.equals("image")) {
                             last_msg.setText("image");
-                        }else if (type.equals("voice")){
+                        } else if (type.equals("voice")) {
                             last_msg.setText("voice");
                         }
                         break;

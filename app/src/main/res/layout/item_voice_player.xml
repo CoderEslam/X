@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <com.doubleclick.voiceplayer.VoicePlayerView
+        android:padding="10dp"
+        android:id="@+id/voicePlayerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:elevation="1dp"
+        app:enableVisualizer="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:playPauseBackgroundColor="@color/teal_200"
+        app:playPauseCornerRadius="100"
+        app:playProgressbarColor="#ff7700"
+        app:progressTimeColor="@color/white"
+        app:seekBarProgressColor="#000"
+        app:seekBarThumbColor="@color/teal_200"
+        app:shareBackgroundColor="@color/teal_200"
+        app:shareCornerRadius="100"
+        app:shareText="SHARE ME"
+        app:showShareButton="false"
+        app:showTiming="true"
+        app:timingBackgroundColor="@color/teal_200"
+        app:viewBackground="#C6C4CF"
+        app:viewCornerRadius="100"
+        app:visualizationNotPlayedColor="#727171"
+        app:visualizationPlayedColor="#ff7700" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -323,6 +323,7 @@ public class DiplomasAdapter extends RecyclerView.Adapter<DiplomasAdapter.Diplom
                             AboutIntent.putExtra("check", check);
                             AboutIntent.putExtra("keyJoin", keyJoin);
                         } else {
+//                            holder.continer.setVisibility(View.VISIBLE);
                             holder.join.setText("join");
                             keyJoin = "join";
                             check = false;

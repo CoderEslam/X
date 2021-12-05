@@ -1,21 +1,42 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
-    id 'androidx.navigation.safeargs'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'realm-android'
+    id 'kotlin-android'
+//    id 'com.google.firebase.crashlytics'
 }
 
+
 android {
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+
+    }
+
     compileSdk 31
 
     defaultConfig {
         applicationId "com.doubleclick.x_course"
+//        resValue 'string', "app_name", "X"
+//        resValue 'string', "support_email", ""
+//        resValue 'string', "geo_api_key", ""
+////        resValue 'string', "admob_app_id", ""
+////        resValue 'string', "admob_banner_id", ""
+//        resValue 'string', "sinch_app_key", ""
+//        resValue 'string', "sinch_app_secret", ""
+//        resValue 'string', "sinch_app_environment", "clientapi.sinch.com"
+//        resValue 'string', "authority", applicationId + ".fileprovider"
+//        resValue 'color', "colorPrimary", "#2196F3"
+//        resValue 'color', "colorPrimaryDark", "#1976D2"
+//        resValue 'color', "colorAccent", "#1A237E"
         minSdk 21
         targetSdk 31
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -30,21 +51,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude("META-INF/*.kotlin_module")
-    }
 }
 
 dependencies {
-
+//    implementation(name:'sinch-android-rtc', version:'3.12.5', ext:'aar')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.0"
+    implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
@@ -53,8 +65,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:20.0.2'
     implementation 'com.google.firebase:firebase-firestore:23.0.3'
     implementation 'com.google.firebase:firebase-storage:20.0.0'
-    implementation project(path: ':AudioPlayer')
-//    implementation project(path: ':RecoredView')
+    implementation 'androidx.emoji:emoji:1.2.0-alpha03'
+    implementation 'com.vanniktech:emoji:0.8.0'
+    implementation "com.vanniktech:emoji-google:0.8.0"
+    implementation project(path: ':VoicePlayer')
+    implementation 'com.google.android.gms:play-services-places:17.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -74,7 +89,6 @@ dependencies {
     //add these libraries retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-//    implementation 'com.google.firebase:firebase-messaging:20.2.4'
     implementation "androidx.multidex:multidex:2.0.1"
     implementation 'com.google.firebase:firebase-messaging:20.2.4'
 
@@ -143,21 +157,32 @@ dependencies {
 
     // optional - Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
-
-
     //https://github.com/omtodkar/ShimmerRecyclerView
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
     implementation 'com.todkars:shimmer-recyclerview:0.4.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-//    implementation 'com.github.mohammadatif:Animatoo:master'
-
-
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.10"
     implementation 'jp.wasabeef:blurry:4.0.0'
-
     implementation 'com.devlomi.record-view:record-view:2.0.1'
+    implementation 'com.karumi:dexter:6.2.3'
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
 
-//    implementation 'com.github.JagarYousef:ChatVoicePlayer:1.1.0'
 
-    //https://www.mobintouch.com/library/chatvoiceplayer/
-//    implementation 'com.github.JagarYousef:ChatVoicePlayer:1.0.7'
+    //////////////////////////////////////////////////////////////
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'com.google.firebase:firebase-core:17.2.3'
+    implementation 'com.google.firebase:firebase-messaging:20.1.3'
+//    implementation 'com.google.firebase:firebase-analytics:17.2.3'
+//    implementation 'com.mxn.soul:flowingdrawer-core:2.1.0'
+    implementation 'io.realm:realm-annotations-processor:4.0.0'
+    implementation 'com.iceteck.silicompressorr:silicompressor:2.1'
+    implementation 'com.eyalbira.loadingdots:loading-dots:1.0.2'
+    implementation 'com.kbeanie:multipicker:1.6@aar'
+
+//    implementation(name: 'sinch-android-rtc', version: '3.12.5', ext: 'aar')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation('com.googlecode.ez-vcard:ez-vcard:0.10.4') {
+        exclude group: 'org.freemarker'
+    }
+
 }
